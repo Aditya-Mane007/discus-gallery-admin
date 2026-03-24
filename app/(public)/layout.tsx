@@ -3,6 +3,8 @@ import { Inter, Bricolage_Grotesque, Space_Grotesk } from "next/font/google";
 import "../globals.css";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -34,11 +36,19 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
       )}
     >
       <body>
-        <TooltipProvider>
-          <div className="w-full min-h-screen flex justify-center items-center">
-            {children}
-          </div>
-        </TooltipProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <TooltipProvider>
+            <div className="w-full min-h-screen flex justify-center items-center">
+              {children}
+              <Toaster />
+            </div>
+          </TooltipProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

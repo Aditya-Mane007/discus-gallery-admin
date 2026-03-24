@@ -22,7 +22,7 @@ function Header({
   breadCrumbLinks: { title: string; link: string }[];
 }) {
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+    <header className="sticky top-0 bg-background flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
       <div className="flex items-center gap-2">
         <SidebarTrigger className="-ml-2 cursor-pointer" />
         <Separator
@@ -34,7 +34,10 @@ function Header({
             {(breadCrumbLinks || []).map((breadCrumb, index) => (
               <div className="flex items-center justify-center">
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href={breadCrumb?.link}>
+                  <BreadcrumbLink
+                    href={breadCrumb?.link}
+                    className="font-medium"
+                  >
                     {breadCrumb?.title}
                   </BreadcrumbLink>
                 </BreadcrumbItem>

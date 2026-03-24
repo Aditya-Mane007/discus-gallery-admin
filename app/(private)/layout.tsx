@@ -23,6 +23,8 @@ export const metadata: Metadata = {
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export default function RootLayout({
   children,
@@ -41,14 +43,22 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col">
-        <TooltipProvider>
-          <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-              <div className="px-4">{children}</div>
-            </SidebarInset>
-          </SidebarProvider>
-        </TooltipProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <TooltipProvider>
+            <SidebarProvider>
+              <AppSidebar />
+              <SidebarInset>
+                <div className="px-4">{children}</div>
+                <Toaster />
+              </SidebarInset>
+            </SidebarProvider>
+          </TooltipProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
