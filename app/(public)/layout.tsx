@@ -1,22 +1,4 @@
 import type { Metadata } from "next";
-import { Inter, Bricolage_Grotesque, Space_Grotesk } from "next/font/google";
-import "../globals.css";
-import { cn } from "@/lib/utils";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { Toaster } from "sonner";
-import { ThemeProvider } from "@/components/theme-provider";
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-
-const SpaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-});
-
-const BricolageGrotesque = Bricolage_Grotesque({
-  variable: "--font-bricolage-grotesque",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,30 +7,11 @@ export const metadata: Metadata = {
 
 function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={cn(
-        "h-full",
-        "antialiased",
-        SpaceGrotesk.variable,
-        BricolageGrotesque.variable,
-        "font-grotesk",
-      )}
-    >
+    <html>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <TooltipProvider>
-            <div className="w-full min-h-screen flex justify-center items-center">
-              {children}
-              <Toaster />
-            </div>
-          </TooltipProvider>
-        </ThemeProvider>
+        <div className="w-full min-h-screen flex justify-center items-center">
+          {children}
+        </div>
       </body>
     </html>
   );

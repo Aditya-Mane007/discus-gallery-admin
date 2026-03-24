@@ -10,7 +10,7 @@ export default function Home() {
           { title: "Products", link: "/dashboard" },
         ]}
       />
-      <div className="flex-1 mb-4 bg-blue-400 over">
+      <div className="flex-1 mb-4">
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora nobis
         soluta voluptatem, ad odit cumque praesentium earum rerum quo? Tenetur
         perferendis eveniet modi, labore maxime officia ipsam vel ratione fugiat

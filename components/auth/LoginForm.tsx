@@ -27,13 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Controller, useForm } from "react-hook-form";
 import { EyeClosedIcon, EyeIcon, Loader } from "lucide-react";
-// import { _, cn, handleAPICall } from "@/lib/utils";
 import { cn } from "@/lib/utils";
-
-import Link from "next/link";
-// import { useMutation, useQueryClient } from "@tanstack/react-query";
-
-// import toast from "react-hot-toast";
 
 import { useRouter } from "next/navigation";
 import {
@@ -42,6 +36,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "../ui/input-group";
+import Link from "next/link";
 // import LoadingScreen from "../../Utils/LoadingScreen";
 // import {
 //   getUserController,
@@ -130,24 +125,18 @@ function LoginForm() {
                   name="password"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    // <Field data-invalid={fieldState.invalid}>
-                    //   <FieldLabel htmlFor="form-rhf-demo-password">
-                    //     Password
-                    //   </FieldLabel>
-                    //   <Input
-                    //     {...field}
-                    //     id="form-rhf-demo-password"
-                    //     aria-invalid={fieldState.invalid}
-                    //     placeholder="e.g Caput Draconis"
-                    //     autoComplete="off"
-                    //   />
-                    //   {fieldState.invalid && (
-                    //     <FieldError errors={[fieldState.error]} />
-                    //   )}
-                    // </Field>
                     <Field className="max-w-sm">
-                      <FieldLabel htmlFor="inline-start-password">
+                      <FieldLabel
+                        htmlFor="inline-start-password"
+                        className="flex justify-between items-center"
+                      >
                         Password
+                        <Link
+                          href="/forget-password"
+                          className="text-[0.80rem] underline"
+                        >
+                          Forget Password ?
+                        </Link>
                       </FieldLabel>
                       <InputGroup>
                         <InputGroupInput
@@ -178,63 +167,6 @@ function LoginForm() {
                   )}
                 />
               </FieldGroup>
-              {/* <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email Address</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="e.g harrypotter@hogwarts.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
-              {/* <FormField
-                control={form.control}
-                name="password"
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <InputGroup
-                        aria-invalid={!!fieldState.error}
-                        className={cn(
-                          "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-10 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-                          "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-                          fieldState.error &&
-                            "has-[[data-slot=input-group-control]:focus-visible]:border-red has-[[data-slot=input-group-control]:focus-visible]:ring-red/50 has-[[data-slot=input-group-control]:focus-visible]:ring-[3px]",
-                          "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-                        )}
-                      >
-                        <InputGroupInput
-                          {...field}
-                          placeholder="e.g. Caput Draconis"
-                          className="p-0"
-                          type={showPassword ? "text" : "password"}
-                        />
-                        <InputGroupAddon align="inline-end" className="p-0">
-                          <InputGroupButton
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            aria-label={
-                              showPassword ? "Hide password" : "Show password"
-                            }
-                          >
-                            {showPassword ? <EyeIcon /> : <EyeClosedIcon />}
-                            {field.error}
-                          </InputGroupButton>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
               <Button type="submit" className="w-full cursor-pointer ">
                 Login
               </Button>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Bricolage_Grotesque, Space_Grotesk } from "next/font/google";
-import "../globals.css";
+import "./globals.css";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -25,22 +25,38 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import QueryClientComponentProvider from "@/hooks/QueryClientComponentProvider";
 
-export default function PrivateRouteLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html>
-      <body>
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>
-            <div className="px-4">{children}</div>
-            <Toaster />
-          </SidebarInset>
-        </SidebarProvider>
+    <html
+      lang="en"
+      className={cn(
+        "h-full",
+        "antialiased",
+        SpaceGrotesk.variable,
+        BricolageGrotesque.variable,
+        "font-grotesk",
+      )}
+    >
+      <body className="min-h-full flex flex-col">
+        <QueryClientComponentProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <TooltipProvider>
+              {children}
+              <Toaster />
+            </TooltipProvider>
+          </ThemeProvider>
+        </QueryClientComponentProvider>
       </body>
     </html>
   );

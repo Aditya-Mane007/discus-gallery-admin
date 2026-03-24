@@ -32,7 +32,7 @@ function Header({
         <Breadcrumb>
           <BreadcrumbList>
             {(breadCrumbLinks || []).map((breadCrumb, index) => (
-              <div className="flex items-center justify-center">
+              <div key={index} className="flex items-center justify-center">
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink
                     href={breadCrumb?.link}
