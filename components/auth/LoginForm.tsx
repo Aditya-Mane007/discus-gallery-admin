@@ -27,7 +27,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Controller, useForm } from "react-hook-form";
 import { EyeClosedIcon, EyeIcon, Loader } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 import { useRouter } from "next/navigation";
 import {
@@ -37,18 +36,16 @@ import {
   InputGroupInput,
 } from "../ui/input-group";
 import Link from "next/link";
-// import LoadingScreen from "../../Utils/LoadingScreen";
-// import {
-//   getUserController,
-//   loginController,
-// } from "@/lib/Services/AuthServices";
-// import useMutationHook from "@/lib/queries/useMutationHook";
+import useMutationHook from "@/hooks/useMutationHook";
+import { loginController } from "@/lib/services/authService";
 
 const formSchema = z.object({
   email: z
     .string()
-    .nonempty({ message: "Email address cannot be empty" })
+    .trim()
+    .min(1, { message: "Email address cannot be empty" })
     .email({ message: "Enter valid email address" }),
+
   password: z
     .string()
     .nonempty({ message: "Password cannot be empty" })
@@ -65,8 +62,6 @@ function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  console.log("SHOW PASSWORD : ", showPassword);
-
   const form = useForm({
     resolver: zodResolver(formSchema),
     mode: "onChange",
@@ -76,16 +71,15 @@ function LoginForm() {
     },
   });
 
-  //   const { mutate, isPending } = useMutationHook(
-  //     form.getValues(),
-  //     loginController,
-  //     ["user-info"],
-  //     () => router.push("/"),
-  //   );
+  const { mutate, isPending } = useMutationHook(
+    form.getValues(),
+    loginController,
+    ["user-info"],
+    () => router.push("/"),
+  );
 
   function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log("VALUES : ", data);
-    //   mutate(values);
+    mutate(data);
   }
 
   return (
@@ -115,7 +109,7 @@ function LoginForm() {
                         placeholder="e.g harrypotter@hogwarts.com"
                         autoComplete="off"
                       />
-                      {fieldState.invalid && (
+                      {(fieldState?.error || fieldState.invalid) && (
                         <FieldError errors={[fieldState.error]} />
                       )}
                     </Field>
@@ -125,7 +119,7 @@ function LoginForm() {
                   name="password"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field className="max-w-sm">
+                    <Field className="w-full flex ">
                       <FieldLabel
                         htmlFor="inline-start-password"
                         className="flex justify-between items-center"
@@ -140,7 +134,7 @@ function LoginForm() {
                       </FieldLabel>
                       <InputGroup>
                         <InputGroupInput
-                          name="password"
+                          {...field}
                           type={showPassword ? "text" : "password"}
                           id="form-rhf-demo-password"
                           aria-invalid={fieldState.invalid}
@@ -163,6 +157,9 @@ function LoginForm() {
                           </InputGroupButton>
                         </InputGroupAddon>
                       </InputGroup>
+                      {(fieldState?.error || fieldState.invalid) && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
                     </Field>
                   )}
                 />

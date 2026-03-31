@@ -7,13 +7,9 @@ export const metadata: Metadata = {
 
 function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html>
-      <body>
-        <div className="w-full min-h-screen flex justify-center items-center">
-          {children}
-        </div>
-      </body>
-    </html>
+    <div className="w-full min-h-screen flex justify-center items-center">
+      {children}
+    </div>
   );
 }
 

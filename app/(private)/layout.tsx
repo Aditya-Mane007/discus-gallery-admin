@@ -32,16 +32,12 @@ export default function PrivateRouteLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html>
-      <body>
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>
-            <div className="px-4">{children}</div>
-            <Toaster />
-          </SidebarInset>
-        </SidebarProvider>
-      </body>
-    </html>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <div className="px-4">{children}</div>
+        <Toaster />
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
