@@ -71,11 +71,19 @@ function LoginForm() {
     },
   });
 
-  const { mutate, isPending } = useMutationHook(
+  const { mutate, isPending, data } = useMutationHook(
     form.getValues(),
     loginController,
     ["user-info"],
-    () => router.push("/"),
+    (response: any) => {
+      const email = response?.user?.email;
+
+      if (email) {
+        localStorage.setItem("user-email", email); // no need JSON.stringify
+      }
+
+      router.push("/verify");
+    },
   );
 
   function onSubmit(data: z.infer<typeof formSchema>) {

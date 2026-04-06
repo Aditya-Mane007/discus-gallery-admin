@@ -6,27 +6,30 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { handleAPICall } from "@/lib/utils";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 function useMutationHook(
   formData: any,
   mutationFunction: (formData: any) => Promise<AxiosResponse<any, any, {}>>,
   queryKeys: string | any[],
-  customFunction: { (): void; (): void },
+  customFunction?: (response: any) => void,
 ) {
-  console.log("MUTATION FORM DATA : ", formData);
+  const router = useRouter();
+  // console.log("MUTATION FORM DATA : ", formData);
   const queryClient = useQueryClient();
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending, data } = useMutation({
     mutationFn: (formData) => handleAPICall(formData, mutationFunction),
     onSuccess: async (response) => {
       toast.success(response?.message);
+
       const queryKeyArray = Array.isArray(queryKeys) ? queryKeys : [queryKeys];
       if (queryKeyArray.length > 0) {
         await queryClient.invalidateQueries({ queryKey: queryKeyArray });
       }
 
       if (customFunction) {
-        customFunction();
+        customFunction(response);
       }
     },
     onError: (error) => {
@@ -36,7 +39,7 @@ function useMutationHook(
     },
   });
 
-  return { mutate, isPending };
+  return { mutate, isPending, data };
 }
 
 export default useMutationHook;

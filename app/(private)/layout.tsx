@@ -24,7 +24,6 @@ export const metadata: Metadata = {
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "sonner";
-import { ThemeProvider } from "@/components/theme-provider";
 
 export default function PrivateRouteLayout({
   children,

@@ -103,3 +103,18 @@ export const timer = (expiryTime: Date) => {
 export function leftFillNum(num: number, targetLength: number) {
   return String(num ?? 0).padStart(targetLength, "0");
 }
+
+export function getCookie(name: string) {
+  return document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(name + "="))
+    ?.split("=")[1];
+}
+
+export function getLocalStoageIeem(key: string) {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem(key);
+  }
+
+  return null;
+}

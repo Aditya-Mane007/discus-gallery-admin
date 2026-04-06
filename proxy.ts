@@ -6,6 +6,8 @@ import type { NextRequest } from "next/server";
 
 const publicRoutes = ["/login", "/forget-password"];
 
+const preVerificationRoutes = ["/verify"];
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -15,23 +17,36 @@ export async function proxy(request: NextRequest) {
 
   const csrfToken = cookieStore?.get("XSRF-TOKEN");
 
-  const sessionId = cookieStore.get("session-id");
+  const sessionId = cookieStore?.get("session-id");
+
+  const tempSessionId = cookieStore?.get("temp-session-id");
+
+  if (preVerificationRoutes.includes(pathname) && !tempSessionId) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (publicRoutes.includes(pathname) && tempSessionId) {
+    return NextResponse.redirect(new URL("/verify", request.url));
+  }
 
   // Redirect logged-in users away from auth pages
-  if (publicRoutes.includes(pathname) && token && csrfToken && sessionId) {
+  if (
+    !preVerificationRoutes.includes(pathname) &&
+    publicRoutes.includes(pathname) &&
+    token &&
+    csrfToken &&
+    sessionId
+  ) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
   // Protect private routes ONLY if no refresh token
   if (
+    !preVerificationRoutes.includes(pathname) &&
     !publicRoutes.includes(pathname) &&
-    (!token || !csrfToken || !sessionId)
+    !sessionId
   ) {
     return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  if (!publicRoutes.includes(pathname) && token && csrfToken && !sessionId) {
-    return NextRe
   }
 
   return NextResponse.next();
