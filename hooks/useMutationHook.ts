@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 function useMutationHook(
-  formData: any,
   mutationFunction: (formData: any) => Promise<AxiosResponse<any, any, {}>>,
   queryKeys: string | any[],
   customFunction?: (response: any) => void,
@@ -21,8 +20,9 @@ function useMutationHook(
   const { mutate, isPending, data } = useMutation({
     mutationFn: (formData) => handleAPICall(formData, mutationFunction),
     onSuccess: async (response) => {
-      toast.success(response?.message);
-
+      if (response?.message) {
+        toast.success(response?.message);
+      }
       const queryKeyArray = Array.isArray(queryKeys) ? queryKeys : [queryKeys];
       if (queryKeyArray.length > 0) {
         await queryClient.invalidateQueries({ queryKey: queryKeyArray });

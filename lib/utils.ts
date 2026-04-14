@@ -85,6 +85,7 @@ export const _ = false;
 
 export const timer = (expiryTime: Date) => {
   const expiry = new Date(expiryTime).getTime();
+
   const currentTime = Date.now();
 
   const diff = expiry - currentTime;

@@ -72,7 +72,6 @@ function LoginForm() {
   });
 
   const { mutate, isPending, data } = useMutationHook(
-    form.getValues(),
     loginController,
     ["user-info"],
     (response: any) => {
