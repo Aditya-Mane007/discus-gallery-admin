@@ -61,15 +61,29 @@ export const handleAPICall = async <TRequest = any, TResponse = any>(
 
     return decryptedData;
   } catch (error: any) {
-    const errorData = decryptPayload(error?.response?.data?.response);
+    let errorData: any = null;
 
-    console.log("ERROR : ", error?.response?.status);
+    if (error?.response?.data?.response) {
+      try {
+        errorData = decryptPayload(error.response.data.response);
+      } catch (decryptErr) {
+        console.error("Failed to decrypt error response", decryptErr);
+      }
+    }
 
-    const message: string = errorData?.message || "Something went wrong";
+    console.log("ERROR : ", errorData || error.message);
+
+    const message: string =
+      errorData?.message ||
+      error?.response?.data?.message ||
+      error.message ||
+      "Something went wrong";
 
     console.log("MESSAGE : ", message);
 
-    throw new Error(message);
+    const customError: any = new Error(message);
+    customError.data = errorData || error?.response?.data;
+    throw customError;
   }
 };
 
@@ -106,6 +120,7 @@ export function leftFillNum(num: number, targetLength: number) {
 }
 
 export function getCookie(name: string) {
+  if (typeof document === "undefined") return undefined;
   return document.cookie
     .split("; ")
     .find((row) => row.startsWith(name + "="))

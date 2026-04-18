@@ -192,6 +192,8 @@ const OtpVerify = () => {
     gcTime: 0,
   });
 
+  console.log("OTP STATUS DATA : ", otpData);
+
   const {
     mutate: resendMutate,
     isPending: resendPending,
@@ -207,9 +209,9 @@ const OtpVerify = () => {
       //   toast.success(response?.message);
     },
     onError: (error) => {
-      //   toast.error(
-      //     error.message || "Something went wrong, please try again later",
-      //   );
+      toast.error(
+        error.message || "Something went wrong, please try again later",
+      );
     },
   });
 
@@ -236,23 +238,34 @@ const OtpVerify = () => {
     return () => clearInterval(interval);
   }, [expirationTime, timeLeft?.minutes, timeLeft?.seconds]);
 
-  const { mutate, isPending } = useMutationHook(otpVerification, ["otp-info"]);
+  const { mutate, isPending, data } = useMutationHook(
+    otpVerification,
+    ["otp-info"],
+    (response) => {
+      console.log("RESPONSE : ", response);
+      if (response?.data !== undefined) {
+        setIsOtpActive(response?.data?.is_otp_active);
+      }
+      if (response?.data?.screen) {
+        route.replace(
+          `${pathname}?verify-email=true&verify=${response?.data?.screen}`,
+        );
+      }
+    },
+    (error) => {
+      console.log("ERROR PAYLOAD : ", error?.data);
+      if (error?.data?.is_otp_active !== undefined) {
+        setIsOtpActive(error.data.is_otp_active);
+      }
+    },
+  );
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log("✅ SUBMIT TRIGGERED", data);
-    mutate(data);
+  console.log("VERIFICATION DATA : ", data);
+
+  function onSubmit(formData: z.infer<typeof formSchema>) {
+    console.log("✅ SUBMIT TRIGGERED", formData);
+    mutate(formData);
   }
-  // onSuccess: (response) => {
-  //   route.replace(
-  //     `${pathname}?verify-email=true&verify=${response?.data?.screen}`,
-  //   );
-  //   toast.success(response?.data?.message);
-  // },
-  // onError: (error) => {
-  //   queryClient.invalidateQueries({ queryKey:  });
-  //   toast.error(error?.message);
-  //   // toast.error(error?.message);
-  // },
 
   console.log(form.getValues());
   return (

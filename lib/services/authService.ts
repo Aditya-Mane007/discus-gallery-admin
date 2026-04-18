@@ -61,6 +61,8 @@ export const otpVerification = async (formData: any) => {
     withCredentials: true,
   });
 
+  console.log("OTP VERIFY DATA : ", res);
+
   return res;
 };
 

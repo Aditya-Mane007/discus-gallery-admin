@@ -12,13 +12,14 @@ function useMutationHook(
   mutationFunction: (formData: any) => Promise<AxiosResponse<any, any, {}>>,
   queryKeys: string | any[],
   customFunction?: (response: any) => void,
+  errorFunction?: (error: any) => void,
 ) {
   const router = useRouter();
   // console.log("MUTATION FORM DATA : ", formData);
   const queryClient = useQueryClient();
 
-  const { mutate, isPending, data } = useMutation({
-    mutationFn: (formData) => handleAPICall(formData, mutationFunction),
+  const mutation = useMutation({
+    mutationFn: (formData: any) => handleAPICall(formData, mutationFunction),
     onSuccess: async (response) => {
       if (response?.message) {
         toast.success(response?.message);
@@ -36,10 +37,15 @@ function useMutationHook(
       if (error?.message) {
         toast.error(error?.message);
       }
+      if (errorFunction) {
+        errorFunction(error);
+      }
     },
   });
 
-  return { mutate, isPending, data };
+  console.log("OTP MUTATUIN DATA : ", mutation.data);
+
+  return mutation;
 }
 
 export default useMutationHook;
