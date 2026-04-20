@@ -251,6 +251,10 @@ const OtpVerify = () => {
           `${pathname}?verify-email=true&verify=${response?.data?.screen}`,
         );
       }
+
+      if (response?.data?.redirectTo) {
+        route.push(response?.data?.redirectTo);
+      }
     },
     (error) => {
       console.log("ERROR PAYLOAD : ", error?.data);
