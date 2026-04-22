@@ -34,6 +34,7 @@ function useMutationHook(
       }
     },
     onError: (error) => {
+      console.log("QUERY ERROR : " , error)
       if (error?.message) {
         toast.error(error?.message);
       }

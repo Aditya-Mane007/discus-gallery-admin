@@ -2,6 +2,8 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import CryptoJS from "crypto-js";
 
+
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -82,7 +84,9 @@ export const handleAPICall = async <TRequest = any, TResponse = any>(
     console.log("MESSAGE : ", message);
 
     const customError: any = new Error(message);
-    customError.data = errorData || error?.response?.data;
+    customError.data = errorData
+
+    console.log("customError , ", customError)
     throw customError;
   }
 };

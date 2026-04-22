@@ -35,6 +35,7 @@ import {
 } from "../ui/card";
 import useAuthQuery from "@/hooks/useAuthQuery";
 import useMutationHook from "@/hooks/useMutationHook";
+import useQueryHook from "@/hooks/useQueryHook"
 import { time } from "console";
 import { toast } from "sonner";
 // import toast from "react-hot-toast";
@@ -55,12 +56,18 @@ function OTPVerification() {
     gcTime: 0,
   });
 
-  console.log("DATA : ", data);
+  
+
+  // console.log("DATA : ", data);
 
   useEffect(() => {
     if (isError) {
       if (error?.message) {
         toast.error(error?.message);
+        console.log("STATUS QUERY : " , error)
+      //   if (response?.data?.redirectTo) {
+      //   route.push(response?.data?.redirectTo);
+      // }
       }
     }
 
@@ -74,6 +81,7 @@ function OTPVerification() {
   useEffect(() => {
     if (data?.data?.screen) {
       setScreen(data?.data?.screen);
+      console.log("DATA : " , data?.data)
       route.replace(
         `${pathname}?verify-email=true&verify=${data?.data?.screen.trim()}`,
       );
@@ -185,9 +193,10 @@ const OtpVerify = () => {
     isPending: otpPending,
     isError,
     error,
-  } = useQuery({
+  } = useQueryHook({
     queryKey: ["otp-info"],
-    queryFn: () => handleAPICall("", getOtpStatus),
+    queryFunction: getOtpStatus,
+    params: "",
     retry: false,
     gcTime: 0,
   });
