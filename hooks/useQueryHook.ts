@@ -4,25 +4,25 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { handleAPICall } from "@/lib/utils";
 import { toast } from "sonner";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
-type QueryFunction<TParams = any> = (
-  params?: TParams
-) => Promise<AxiosResponse<any, any>>;
+type QueryFunction<TParams = any, TResponse = any> = (
+  params?: TParams,
+) => Promise<AxiosResponse<TResponse>>;
 
-interface UseQueryHookProps<TParams> {
+interface UseQueryHookProps<TParams, TResponse> {
   queryKey: string | any[];
-  queryFunction: QueryFunction<TParams>;
+  queryFunction: QueryFunction<TParams, TResponse>;
   params?: TParams;
   enabled?: boolean;
-  customFunction?: (data: any) => void;
+  customFunction?: (data: TResponse) => void;
   errorFunction?: (error: any) => void;
   staleTime?: number;
   retry?: boolean | number;
   gcTime?: number;
 }
 
-function useQueryHook<TParams = any>({
+function useQueryHook<TParams = any, TResponse = any>({
   queryKey,
   queryFunction,
   params,
@@ -30,9 +30,11 @@ function useQueryHook<TParams = any>({
   customFunction,
   errorFunction,
   staleTime = 0,
-  retry,
+  retry = 1,
   gcTime,
-}: UseQueryHookProps<TParams>) {
+}: UseQueryHookProps<TParams, TResponse>) {
+  const hasShownSuccess = useRef(false);
+
   const queryKeyArray = Array.isArray(queryKey)
     ? [...queryKey, params]
     : [queryKey, params];
@@ -47,25 +49,26 @@ function useQueryHook<TParams = any>({
   });
 
   useEffect(() => {
-    if (query.isSuccess && query.data) {
-      if (query.data?.message) {
-        toast.success(query.data.message);
+    if (query.isSuccess && query.data && !hasShownSuccess.current) {
+      hasShownSuccess.current = true;
+
+      if ((query.data as any)?.message) {
+        toast.success((query.data as any).message);
       }
-      if (customFunction) {
-        customFunction(query.data);
-      }
+
+      customFunction?.(query.data);
     }
-  }, [query.isSuccess, query.data]); // exclude customFunction to prevent re-rendering loops
+  }, [query.isSuccess, query.data]);
 
   useEffect(() => {
     if (query.isError && query.error) {
-      const errorData = query.error as any;
+      const errorData = query.error as { message?: string };
+
       if (errorData?.message) {
         toast.error(errorData.message);
       }
-      if (errorFunction) {
-        errorFunction(query.error);
-      }
+
+      errorFunction?.(query.error);
     }
   }, [query.isError, query.error]);
 

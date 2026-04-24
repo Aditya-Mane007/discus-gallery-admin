@@ -35,7 +35,7 @@ import {
 } from "../ui/card";
 import useAuthQuery from "@/hooks/useAuthQuery";
 import useMutationHook from "@/hooks/useMutationHook";
-import useQueryHook from "@/hooks/useQueryHook"
+import useQueryHook from "@/hooks/useQueryHook";
 import { time } from "console";
 import { toast } from "sonner";
 // import toast from "react-hot-toast";
@@ -49,39 +49,50 @@ function OTPVerification() {
   const route = useRouter();
   const [screen, setScreen] = useState("email");
 
+  const router = useRouter();
+
   const { data, isPending, isSuccess, isError, error } = useQuery({
     queryKey: ["otp-info"],
-    queryFn: () => handleAPICall("", getOtpStatus),
+    queryFn: () => handleAPICall(undefined, getOtpStatus),
     retry: false,
     gcTime: 0,
   });
 
-  
-
-  // console.log("DATA : ", data);
-
   useEffect(() => {
-    if (isError) {
-      if (error?.message) {
-        toast.error(error?.message);
-        console.log("STATUS QUERY : " , error)
-      //   if (response?.data?.redirectTo) {
-      //   route.push(response?.data?.redirectTo);
-      // }
+    // ✅ ERROR CASE
+    if (isError && error) {
+      const err: any = error;
+
+      // 🔥 Handle redirect from error response
+      if (err?.data?.redirectTo) {
+        router.push(err.data.redirectTo);
+        return;
+      }
+
+      if (err?.message) {
+        toast.error(err.message);
+        console.log("STATUS QUERY:", err);
       }
     }
 
-    if (isSuccess) {
+    // ✅ SUCCESS CASE
+    if (isSuccess && data) {
+      // 🔥 Handle redirect from success response
+      if (data?.redirectTo) {
+        router.push(data.redirectTo);
+        return;
+      }
+
       if (data?.message) {
-        toast.success(data?.message);
+        toast.success(data.message);
       }
     }
-  }, [isError, isSuccess]);
+  }, [isError, isSuccess, data, error]);
 
   useEffect(() => {
     if (data?.data?.screen) {
       setScreen(data?.data?.screen);
-      console.log("DATA : " , data?.data)
+      console.log("DATA : ", data?.data);
       route.replace(
         `${pathname}?verify-email=true&verify=${data?.data?.screen.trim()}`,
       );
@@ -210,11 +221,13 @@ const OtpVerify = () => {
   } = useMutation({
     mutationFn: () => handleAPICall(null, sendEmailVerifictionOtp),
     onSuccess: async (response) => {
+      console.log("RESPONSE : ", response);
       queryClient.invalidateQueries({ queryKey: ["otp-info"] });
       setTimeLeft({
         minutes: null,
         seconds: null,
       });
+      setExpirationTime(response?.data?.expires_at);
       //   toast.success(response?.message);
     },
     onError: (error) => {
@@ -224,10 +237,19 @@ const OtpVerify = () => {
     },
   });
 
+  console.log("otpData : ", otpData, otpData?.data?.is_otp_active);
+
   useEffect(() => {
     setOtpAttempts(otpData?.data?.otp_attempts);
     setExpirationTime(otpData?.data?.expires_at);
     setIsOtpActive(otpData?.data?.is_otp_active);
+
+    if (otpData?.data?.is_otp_active == false) {
+      setTimeLeft({
+        minutes: 0,
+        seconds: 0,
+      });
+    }
   }, [otpData]);
 
   useEffect(() => {
@@ -238,6 +260,8 @@ const OtpVerify = () => {
     const interval = setInterval(() => {
       const timeLeft = timer(expirationTime);
 
+      console.log(timeLeft);
+
       setTimeLeft({
         minutes: timeLeft[0],
         seconds: timeLeft[1],
@@ -246,6 +270,8 @@ const OtpVerify = () => {
 
     return () => clearInterval(interval);
   }, [expirationTime, timeLeft?.minutes, timeLeft?.seconds]);
+
+  console.log("TIME : ", timeLeft);
 
   const { mutate, isPending, data } = useMutationHook(
     otpVerification,
@@ -269,6 +295,13 @@ const OtpVerify = () => {
       console.log("ERROR PAYLOAD : ", error?.data);
       if (error?.data?.is_otp_active !== undefined) {
         setIsOtpActive(error.data.is_otp_active);
+
+        if (error.data.is_otp_active === false) {
+          setTimeLeft({
+            minutes: 0,
+            seconds: 0,
+          });
+        }
       }
     },
   );
