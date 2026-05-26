@@ -101,14 +101,31 @@ export const consoleLog = (title: string, value: string) => {
 
 export const _ = false;
 
-export const timer = (expiryTime: Date) => {
-  const expiry = new Date(expiryTime).getTime();
+export const timer = (expiryTime: string | Date | number) => {
+  if (!expiryTime) return [0, 0];
+
+  let expiry: number;
+  if (typeof expiryTime === "number") {
+    expiry = expiryTime;
+  } else if (expiryTime instanceof Date) {
+    expiry = expiryTime.getTime();
+  } else {
+    // Ensure the date string is correctly parsed as UTC if no timezone offset is provided
+    let formatted = expiryTime.trim();
+    if (!formatted.includes("Z") && !formatted.includes("+") && !formatted.includes("-")) {
+      formatted = formatted.replace(" ", "T");
+      if (!formatted.endsWith("Z")) {
+        formatted += "Z";
+      }
+    }
+    expiry = new Date(formatted).getTime();
+  }
 
   const currentTime = Date.now();
 
   const diff = expiry - currentTime;
 
-  if (diff <= 0) {
+  if (isNaN(diff) || diff <= 0) {
     return [0, 0];
   }
 
@@ -119,7 +136,7 @@ export const timer = (expiryTime: Date) => {
   return [minutes, seconds];
 };
 
-export function leftFillNum(num: number, targetLength: number) {
+export function leftFillNum(num: number | null | undefined, targetLength: number) {
   return String(num ?? 0).padStart(targetLength, "0");
 }
 

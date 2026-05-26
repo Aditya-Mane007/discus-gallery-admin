@@ -41,7 +41,7 @@ function useQueryHook<TParams = any, TResponse = any>({
 
   const query = useQuery({
     queryKey: queryKeyArray,
-    queryFn: () => handleAPICall(params, queryFunction),
+    queryFn: () => handleAPICall(params, queryFunction as any),
     enabled,
     staleTime,
     retry,

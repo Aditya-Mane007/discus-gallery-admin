@@ -118,7 +118,7 @@ function OTPVerification() {
       {screen === "email" ? (
         <EmailVerify />
       ) : screen === "otp" ? (
-        <OtpVerify data={data?.data} />
+        <OtpVerify />
       ) : (
         "Failed"
       )}
@@ -182,13 +182,16 @@ const OtpVerify = () => {
   const pathname = usePathname();
   const queryClient = useQueryClient();
 
-  const [timeLeft, setTimeLeft] = useState({
+  const [timeLeft, setTimeLeft] = useState<{
+    minutes: number | null;
+    seconds: number | null;
+  }>({
     minutes: null,
     seconds: null,
   });
 
   const [otpAttempts, setOtpAttempts] = useState(0);
-  const [expirationTime, setExpirationTime] = useState(null);
+  const [expirationTime, setExpirationTime] = useState<string | null>(null);
   const [isOtpActive, setIsOtpActive] = useState(false);
 
   const form = useForm({
@@ -240,36 +243,48 @@ const OtpVerify = () => {
   console.log("otpData : ", otpData, otpData?.data?.is_otp_active);
 
   useEffect(() => {
+    console.log("OTPDATA : ", otpData, otpData?.data);
     setOtpAttempts(otpData?.data?.otp_attempts);
-    setExpirationTime(otpData?.data?.expires_at);
+    setExpirationTime(
+      otpData?.data?.is_otp_active ? otpData?.data?.expires_at : null,
+    );
     setIsOtpActive(otpData?.data?.is_otp_active);
 
     if (otpData?.data?.is_otp_active == false) {
       setTimeLeft({
-        minutes: 0,
-        seconds: 0,
+        minutes: null,
+        seconds: null,
       });
     }
   }, [otpData]);
 
   useEffect(() => {
     if (!expirationTime) return;
-    if (timeLeft?.minutes === 0 && timeLeft?.seconds === 0) {
+
+    // Calculate time remaining immediately to prevent 1-second delay
+    const updateTimer = () => {
+      const timeRemaining = timer(expirationTime);
+      setTimeLeft({
+        minutes: timeRemaining[0],
+        seconds: timeRemaining[1],
+      });
+      return timeRemaining;
+    };
+
+    const initialTimeRemaining = updateTimer();
+    if (initialTimeRemaining[0] === 0 && initialTimeRemaining[1] === 0) {
       return;
     }
+
     const interval = setInterval(() => {
-      const timeLeft = timer(expirationTime);
-
-      console.log(timeLeft);
-
-      setTimeLeft({
-        minutes: timeLeft[0],
-        seconds: timeLeft[1],
-      });
+      const timeRemaining = updateTimer();
+      if (timeRemaining[0] === 0 && timeRemaining[1] === 0) {
+        clearInterval(interval);
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [expirationTime, timeLeft?.minutes, timeLeft?.seconds]);
+  }, [expirationTime]);
 
   console.log("TIME : ", timeLeft);
 
@@ -280,6 +295,13 @@ const OtpVerify = () => {
       console.log("RESPONSE : ", response);
       if (response?.data !== undefined) {
         setIsOtpActive(response?.data?.is_otp_active);
+        if (response?.data?.is_otp_active === false) {
+          setExpirationTime(null);
+          setTimeLeft({
+            minutes: null,
+            seconds: null,
+          });
+        }
       }
       if (response?.data?.screen) {
         route.replace(
@@ -293,13 +315,17 @@ const OtpVerify = () => {
     },
     (error) => {
       console.log("ERROR PAYLOAD : ", error?.data);
+      if (error?.data?.otp_attempts !== undefined) {
+        setOtpAttempts(error.data.otp_attempts);
+      }
       if (error?.data?.is_otp_active !== undefined) {
         setIsOtpActive(error.data.is_otp_active);
 
         if (error.data.is_otp_active === false) {
+          setExpirationTime(null);
           setTimeLeft({
-            minutes: 0,
-            seconds: 0,
+            minutes: null,
+            seconds: null,
           });
         }
       }
