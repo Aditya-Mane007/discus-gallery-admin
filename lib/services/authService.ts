@@ -37,6 +37,8 @@ export const getUserController = async () => {
     withCredentials: true,
   });
 
+  console.log("RES : ", res);
+
   return res;
 };
 

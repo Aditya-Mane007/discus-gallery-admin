@@ -286,16 +286,17 @@ const OtpVerify = () => {
     return () => clearInterval(interval);
   }, [expirationTime]);
 
-  console.log("TIME : ", timeLeft);
+  // console.log("TIME : ", timeLeft);
 
   const { mutate, isPending, data } = useMutationHook(
     otpVerification,
-    ["otp-info"],
+    [],
     (response) => {
       console.log("RESPONSE : ", response);
-      if (response?.data !== undefined) {
-        setIsOtpActive(response?.data?.is_otp_active);
-        if (response?.data?.is_otp_active === false) {
+      const isOtpActiveVal = response?.data?.is_otp_active ?? response?.is_otp_active;
+      if (isOtpActiveVal !== undefined) {
+        setIsOtpActive(isOtpActiveVal);
+        if (isOtpActiveVal === false) {
           setExpirationTime(null);
           setTimeLeft({
             minutes: null,
@@ -303,14 +304,17 @@ const OtpVerify = () => {
           });
         }
       }
-      if (response?.data?.screen) {
+      
+      const screen = response?.data?.screen ?? response?.screen;
+      if (screen) {
         route.replace(
-          `${pathname}?verify-email=true&verify=${response?.data?.screen}`,
+          `${pathname}?verify-email=true&verify=${screen}`,
         );
       }
 
-      if (response?.data?.redirectTo) {
-        route.push(response?.data?.redirectTo);
+      const redirectTo = response?.data?.redirectTo ?? response?.redirectTo;
+      if (redirectTo) {
+        route.push(redirectTo);
       }
     },
     (error) => {
