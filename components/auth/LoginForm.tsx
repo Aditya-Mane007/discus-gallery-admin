@@ -50,7 +50,7 @@ const formSchema = z.object({
     .string()
     .nonempty({ message: "Password cannot be empty" })
     .min(5, { message: "A password must be at least 5 characters long" })
-    .max(15, { message: "A password must be at most 15 characters" })
+    .max(50, { message: "A password must be at most 50 characters" })
     .regex(
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).+$/,
       "Password must contain at least one number and one special character",
