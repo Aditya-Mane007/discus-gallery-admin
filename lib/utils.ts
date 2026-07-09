@@ -2,8 +2,6 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import CryptoJS from "crypto-js";
 
-
-
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -43,9 +41,11 @@ export const handleAPICall = async <TRequest = any, TResponse = any>(
   callback: ApiCallback<any, TResponse>,
 ): Promise<TResponse> => {
   try {
-    const encryptedData = formData
-      ? { request: encryptPayload(formData) }
-      : undefined;
+    // const encryptedData = formData
+    //   ? { request: encryptPayload(formData) }
+    //   : undefined;
+
+    const encryptedData = formData;
 
     console.log("FORM DATA : ", formData);
 
@@ -53,25 +53,27 @@ export const handleAPICall = async <TRequest = any, TResponse = any>(
       ? await callback(encryptedData)
       : await callback();
 
-    const decryptedData: TResponse = decryptPayload(res.data?.response);
+    // const decryptedData: TResponse = decryptPayload(res.data?.response);
 
-    console.log("Decrypted API Response:", decryptedData);
+    // console.log("Decrypted API Response:", decryptedData);
 
-    if (!decryptedData) {
-      throw new Error("Invalid response from server");
-    }
+    // if (!decryptedData) {
+    //   throw new Error("Invalid response from server");
+    // }
 
-    return decryptedData;
+    // return decryptedData;
+
+    return res.data.response as unknown as TResponse;
   } catch (error: any) {
     let errorData: any = null;
 
-    if (error?.response?.data?.response) {
-      try {
-        errorData = decryptPayload(error.response.data.response);
-      } catch (decryptErr) {
-        console.error("Failed to decrypt error response", decryptErr);
-      }
-    }
+    // if (error?.response?.data?.response) {
+    //   try {
+    //     errorData = decryptPayload(error.response.data.response);
+    //   } catch (decryptErr) {
+    //     console.error("Failed to decrypt error response", decryptErr);
+    //   }
+    // }
 
     console.log("ERROR : ", errorData || error.message);
 
@@ -84,9 +86,9 @@ export const handleAPICall = async <TRequest = any, TResponse = any>(
     console.log("MESSAGE : ", message);
 
     const customError: any = new Error(message);
-    customError.data = errorData
+    customError.data = errorData;
 
-    console.log("customError , ", customError)
+    console.log("customError , ", customError);
     throw customError;
   }
 };
@@ -112,7 +114,11 @@ export const timer = (expiryTime: string | Date | number) => {
   } else {
     // Ensure the date string is correctly parsed as UTC if no timezone offset is provided
     let formatted = expiryTime.trim();
-    if (!formatted.includes("Z") && !formatted.includes("+") && !formatted.includes("-")) {
+    if (
+      !formatted.includes("Z") &&
+      !formatted.includes("+") &&
+      !formatted.includes("-")
+    ) {
       formatted = formatted.replace(" ", "T");
       if (!formatted.endsWith("Z")) {
         formatted += "Z";
@@ -136,7 +142,10 @@ export const timer = (expiryTime: string | Date | number) => {
   return [minutes, seconds];
 };
 
-export function leftFillNum(num: number | null | undefined, targetLength: number) {
+export function leftFillNum(
+  num: number | null | undefined,
+  targetLength: number,
+) {
   return String(num ?? 0).padStart(targetLength, "0");
 }
 
