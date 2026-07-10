@@ -99,72 +99,75 @@ function OTPVerification() {
     }
   }, [data]);
 
-  useEffect(() => {
-    if (searchParams.get("verify") === "email") {
-      setScreen("email");
-    }
+  // useEffect(() => {
+  //   if (searchParams.get("verify") === "email") {
+  //     setScreen("email");
+  //   }
 
-    if (searchParams.get("verify") === "otp") {
-      setScreen("otp");
-    }
+  //   if (searchParams.get("verify") === "otp") {
+  //     setScreen("otp");
+  //   }
 
-    if (searchParams.get("verify") === "verified") {
-      setScreen("verified");
-    }
-  }, [searchParams.get("verify")]);
+  //   if (searchParams.get("verify") === "verified") {
+  //     setScreen("verified");
+  //   }
+  // }, [searchParams.get("verify")]);
 
   return (
+    // <div className="w-full max-w-[90%] sm:max-w-md">
+    //   {screen === "email" ? (
+    //     <EmailVerify />
+    //   ) : screen === "otp" ? (
+    // <OtpVerify />
+    //   ) : (
+    //     "Failed"
+    //   )}
+    // </div>
     <div className="w-full max-w-[90%] sm:max-w-md">
-      {screen === "email" ? (
-        <EmailVerify />
-      ) : screen === "otp" ? (
-        <OtpVerify />
-      ) : (
-        "Failed"
-      )}
+      <OtpVerify />
     </div>
   );
 }
 
 export default OTPVerification;
 
-const EmailVerify = () => {
-  const { user } = useAuthQuery();
+// const EmailVerify = () => {
+//   const { user } = useAuthQuery();
 
-  const route = useRouter();
-  const pathname = usePathname();
+//   const route = useRouter();
+//   const pathname = usePathname();
 
-  const { mutate, isPending, data } = useMutation({
-    mutationFn: () => handleAPICall(null, sendEmailVerifictionOtp),
-    onSuccess: async (response) => {
-      route.replace(
-        `${pathname}?verify-email=true&verify=${response?.data?.screen.trim()}`,
-      );
-      // toast.success(response?.message);
-    },
-    onError: (error) => {
-      // toast.error(error.message);
-    },
-  });
+//   const { mutate, isPending, data } = useMutation({
+//     mutationFn: () => handleAPICall(null, sendEmailVerifictionOtp),
+//     onSuccess: async (response) => {
+//       route.replace(
+//         `${pathname}?verify-email=true&verify=${response?.data?.screen.trim()}`,
+//       );
+//       // toast.success(response?.message);
+//     },
+//     onError: (error) => {
+//       // toast.error(error.message);
+//     },
+//   });
 
-  return (
-    <div>
-      <Input
-        placeholder="e.g harrypotter@hogwarts.com"
-        value={user?.data?.email}
-        type="email"
-        readOnly
-        className="border border-black/50"
-        disabled
-      />
-      <div className="flex justify-end mt-4">
-        <Button className="cursor-pointer" onClick={() => mutate()}>
-          {isPending ? "Sending..." : "Send OTP"}
-        </Button>
-      </div>
-    </div>
-  );
-};
+//   return (
+//     <div>
+//       <Input
+//         placeholder="e.g harrypotter@hogwarts.com"
+//         value={user?.data?.email}
+//         type="email"
+//         readOnly
+//         className="border border-black/50"
+//         disabled
+//       />
+//       <div className="flex justify-end mt-4">
+//         <Button className="cursor-pointer" onClick={() => mutate()}>
+//           {isPending ? "Sending..." : "Send OTP"}
+//         </Button>
+//       </div>
+//     </div>
+//   );
+// };
 
 const formSchema = z.object({
   otp: z
@@ -178,6 +181,11 @@ const formSchema = z.object({
 });
 
 const OtpVerify = () => {
+  // User Info
+  const { user } = useAuthQuery();
+
+  console.log("USER INFO CACHED : ", user);
+
   const route = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -243,12 +251,13 @@ const OtpVerify = () => {
   console.log("otpData : ", otpData, otpData?.data?.is_otp_active);
 
   useEffect(() => {
-    console.log("OTPDATA : ", otpData, otpData?.data);
+    console.log("OTPDATA : ", otpData?.data);
     setOtpAttempts(otpData?.data?.otp_attempts);
-    setExpirationTime(
-      otpData?.data?.is_otp_active ? otpData?.data?.expires_at : null,
-    );
-    setIsOtpActive(otpData?.data?.is_otp_active);
+    // setExpirationTime(
+    //   otpData?.data?.is_otp_active ? otpData?.data?.expires_at : null,
+    // );
+    setExpirationTime(otpData?.data?.can_resend_in);
+    setIsOtpActive(otpData?.data?.otp_verification_attempts);
 
     if (otpData?.data?.is_otp_active == false) {
       setTimeLeft({
@@ -293,7 +302,8 @@ const OtpVerify = () => {
     [],
     (response) => {
       console.log("RESPONSE : ", response);
-      const isOtpActiveVal = response?.data?.is_otp_active ?? response?.is_otp_active;
+      const isOtpActiveVal =
+        response?.data?.is_otp_active ?? response?.is_otp_active;
       if (isOtpActiveVal !== undefined) {
         setIsOtpActive(isOtpActiveVal);
         if (isOtpActiveVal === false) {
@@ -304,12 +314,10 @@ const OtpVerify = () => {
           });
         }
       }
-      
+
       const screen = response?.data?.screen ?? response?.screen;
       if (screen) {
-        route.replace(
-          `${pathname}?verify-email=true&verify=${screen}`,
-        );
+        route.replace(`${pathname}?verify-email=true&verify=${screen}`);
       }
 
       const redirectTo = response?.data?.redirectTo ?? response?.redirectTo;
@@ -350,9 +358,7 @@ const OtpVerify = () => {
         <CardHeader>
           <CardTitle className="font-extrabold">Enter OTP</CardTitle>
           <CardDescription>
-            We’ve sent an OTP to{" "}
-            {getLocalStoageIeem("user-email") ??
-              "having some issue fetching email"}
+            We’ve sent an OTP to {user?.email ?? "Error Fetching User Info"}
           </CardDescription>
         </CardHeader>
         <CardContent className="w-full">
@@ -431,10 +437,10 @@ const OtpVerify = () => {
                   <div className="text-sm flex justify-end itmes-center ">
                     <span className="mx-2">Resed OTP in</span>
                     <span className="flex items-center justify-between ">
-                      <span>{leftFillNum(timeLeft?.minutes, 2)} </span>
-                      <span className="mx-1">:</span>
+                      {/* <span>{leftFillNum(timeLeft?.minutes, 2)} </span>
+                      <span className="mx-1">:</span> */}
                       <span className="tracking-wide ">
-                        {leftFillNum(timeLeft?.seconds, 2)}
+                        {leftFillNum(timeLeft?.seconds, 2)} seconds
                       </span>
                     </span>
                   </div>

@@ -1,3 +1,5 @@
+import AuthGuard from "@/components/auth/AuthGurard";
+import useAuthQuery from "@/hooks/useAuthQuery";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,10 +8,16 @@ export const metadata: Metadata = {
 };
 
 function VerifyLayout({ children }: { children: React.ReactNode }) {
+  // const data = useAuthQuery();
+
+  // console.log("DATA : ", data);
+
   return (
-    <div className="w-full min-h-screen flex justify-center items-center">
-      {children}
-    </div>
+    <AuthGuard>
+      <div className="w-full min-h-screen flex justify-center items-center">
+        {children}
+      </div>
+    </AuthGuard>
   );
 }
 

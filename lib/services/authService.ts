@@ -33,7 +33,7 @@ export const getRefreshToken = async () => {
 };
 
 export const getUserController = async () => {
-  const res = await api.get(AUTH_API + "/auth/getuser", {
+  const res = await api.get(AUTH_API + "/auth/me", {
     withCredentials: true,
   });
 

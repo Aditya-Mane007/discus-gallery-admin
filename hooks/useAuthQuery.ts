@@ -12,7 +12,11 @@ function useAuthQuery() {
     queryKey: ["user-info"],
     queryFn: () => handleAPICall("", getUserController),
     staleTime: Infinity,
+    gcTime: Infinity, // keep it in memory while the app is open
     retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
   });
 
   useEffect(() => {

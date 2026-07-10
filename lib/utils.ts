@@ -63,7 +63,11 @@ export const handleAPICall = async <TRequest = any, TResponse = any>(
 
     // return decryptedData;
 
-    return res.data.response as unknown as TResponse;
+    console.log("RES DATA : ", res);
+
+    // return res.data.response as unknown as TResponse;
+
+    return res.data as unknown as TResponse;
   } catch (error: any) {
     let errorData: any = null;
 

@@ -81,7 +81,11 @@ function LoginForm() {
         localStorage.setItem("user-email", email); // no need JSON.stringify
       }
 
-      router.push("/verify");
+      console.log("redirectTo : ", response);
+
+      if (response?.redirectTo) {
+        router.push(`${response?.redirectTo}`);
+      }
     },
   );
 
