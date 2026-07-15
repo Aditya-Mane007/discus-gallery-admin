@@ -1,9 +1,9 @@
-import axios from "axios";
-import { AUTH_API } from "../API_URL";
-import { getCookie } from "../utils";
+import axios from 'axios';
+import { AUTH_API } from '../API_URL';
+import { getCookie } from '../utils';
 
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: '/api',
   withCredentials: true,
 });
 
@@ -35,21 +35,22 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       // If we receive a 401 during OTP verification, the session has expired.
       // We check the cookie, the current page URL, or the error message to be robust.
-      if (typeof window !== "undefined") {
-        const temSessionId = getCookie("tem_session_id");
-        const isOnVerifyPage = window.location.pathname.includes("/verify");
-        const isSessionExpiredMsg = error.response?.data?.message
-          ?.toLowerCase()
-          ?.includes("expire");
+      if (typeof window !== 'undefined') {
+        const temSessionId = getCookie('tem_session_id');
+        const isOnVerifyPage = window.location.pathname.includes('/verify');
+        // const isSessionExpiredMsg = error.response?.data?.message
+        //   ?.toLowerCase()
+        //   ?.includes("expire");
 
-        if (temSessionId || isOnVerifyPage || isSessionExpiredMsg) {
-          window.location.href = "/login";
+        // if (temSessionId || isOnVerifyPage || isSessionExpiredMsg) {
+        if (temSessionId || isOnVerifyPage) {
+          window.location.href = '/login';
           return Promise.reject(error);
         }
       }
 
       // Do not attempt to refresh if refresh endpoint itself fails.
-      if (originalRequest.url?.includes("/auth/refresh-token")) {
+      if (originalRequest.url?.includes('/auth/refresh-token')) {
         return Promise.reject(error);
       }
 
@@ -66,7 +67,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await axios.get(AUTH_API + "/auth/refresh-token", {
+        await axios.get(AUTH_API + '/auth/refresh-token', {
           withCredentials: true,
         });
 

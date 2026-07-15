@@ -248,21 +248,24 @@ const OtpVerify = () => {
     },
   });
 
-  console.log("otpData : ", otpData, otpData?.data?.is_otp_active);
+  // console.log("otpData : ", otpData, otpData?.data?.is_otp_active);
 
   useEffect(() => {
-    console.log("OTPDATA : ", otpData?.data);
+    console.log("OTPDATA : ", otpData?.data?.can_resend_in);
     setOtpAttempts(otpData?.data?.otp_attempts);
     // setExpirationTime(
     //   otpData?.data?.is_otp_active ? otpData?.data?.expires_at : null,
     // );
-    setExpirationTime(otpData?.data?.can_resend_in);
-    setIsOtpActive(otpData?.data?.otp_verification_attempts);
+    setExpirationTime(
+      otpData?.data?.can_resend_in == true
+        ? null
+        : otpData?.data?.can_resend_in,
+    );
 
-    if (otpData?.data?.is_otp_active == false) {
+    if (otpData?.data?.can_resend_in == true) {
       setTimeLeft({
-        minutes: null,
-        seconds: null,
+        minutes: 0,
+        seconds: 0,
       });
     }
   }, [otpData]);
@@ -295,30 +298,14 @@ const OtpVerify = () => {
     return () => clearInterval(interval);
   }, [expirationTime]);
 
-  // console.log("TIME : ", timeLeft);
+  console.log("TIME : ", timeLeft);
 
   const { mutate, isPending, data } = useMutationHook(
     otpVerification,
     [],
     (response) => {
       console.log("RESPONSE : ", response);
-      const isOtpActiveVal =
-        response?.data?.is_otp_active ?? response?.is_otp_active;
-      if (isOtpActiveVal !== undefined) {
-        setIsOtpActive(isOtpActiveVal);
-        if (isOtpActiveVal === false) {
-          setExpirationTime(null);
-          setTimeLeft({
-            minutes: null,
-            seconds: null,
-          });
-        }
-      }
-
-      const screen = response?.data?.screen ?? response?.screen;
-      if (screen) {
-        route.replace(`${pathname}?verify-email=true&verify=${screen}`);
-      }
+      // queryClient.invalidateQueries({ queryKey: ["otp-info"] });
 
       const redirectTo = response?.data?.redirectTo ?? response?.redirectTo;
       if (redirectTo) {
@@ -327,20 +314,7 @@ const OtpVerify = () => {
     },
     (error) => {
       console.log("ERROR PAYLOAD : ", error?.data);
-      if (error?.data?.otp_attempts !== undefined) {
-        setOtpAttempts(error.data.otp_attempts);
-      }
-      if (error?.data?.is_otp_active !== undefined) {
-        setIsOtpActive(error.data.is_otp_active);
-
-        if (error.data.is_otp_active === false) {
-          setExpirationTime(null);
-          setTimeLeft({
-            minutes: null,
-            seconds: null,
-          });
-        }
-      }
+      queryClient.invalidateQueries({ queryKey: ["otp-info"] });
     },
   );
 
@@ -374,8 +348,33 @@ const OtpVerify = () => {
                       className="flex justify-between items-center"
                     >
                       Verification code{" "}
-                      <span>Remainig Attempts : {otpAttempts ?? 0}</span>
+                      {otpPending ? (
+                        <div>Loading..</div>
+                      ) : (
+                        <>
+                          {timeLeft?.minutes == 0 && timeLeft?.seconds == 0 ? (
+                            <Button
+                              type="button"
+                              variant="link"
+                              className="underline cursor-pointer px-0 mx-0"
+                              onClick={() => resendMutate()}
+                            >
+                              Resend OTP
+                            </Button>
+                          ) : (
+                            <div className="text-sm flex justify-end itmes-center ">
+                              <span className="mx-2">Try again in</span>
+                              <span className="flex items-center justify-between ">
+                                <span className="tracking-wide ">
+                                  {leftFillNum(timeLeft?.seconds, 2)} seconds
+                                </span>
+                              </span>
+                            </div>
+                          )}
+                        </>
+                      )}
                     </FieldLabel>
+
                     <InputOTP
                       maxLength={6}
                       id="otp"
@@ -418,35 +417,6 @@ const OtpVerify = () => {
               />
             </FieldGroup>
 
-            {otpPending ? (
-              <div>Loading..</div>
-            ) : (
-              <>
-                {isOtpActive == false ||
-                (timeLeft?.minutes == 0 && timeLeft?.seconds == 0) ? (
-                  <div className="text-sm flex justify-end itmes-center">
-                    Didn't Recieve ?{" "}
-                    <span
-                      className="underline cursor-pointer mx-1"
-                      onClick={() => resendMutate()}
-                    >
-                      Resend OTP
-                    </span>
-                  </div>
-                ) : (
-                  <div className="text-sm flex justify-end itmes-center ">
-                    <span className="mx-2">Resed OTP in</span>
-                    <span className="flex items-center justify-between ">
-                      {/* <span>{leftFillNum(timeLeft?.minutes, 2)} </span>
-                      <span className="mx-1">:</span> */}
-                      <span className="tracking-wide ">
-                        {leftFillNum(timeLeft?.seconds, 2)} seconds
-                      </span>
-                    </span>
-                  </div>
-                )}
-              </>
-            )}
             <div className="flex justify-end items-center">
               <Button
                 type="submit"
