@@ -1,23 +1,23 @@
-import axios from "axios";
-import { AUTH_API } from "../API_URL";
-import api from "../api/apiInterceptor";
+import axios from 'axios';
+import { AUTH_API } from '../API_URL';
+import api from '../api/apiInterceptor';
 
 export const registerController = async (formData: any) => {
-  const res = await api.post(AUTH_API + "/auth/register", formData, {
+  const res = await api.post(AUTH_API + '/auth/register', formData, {
     withCredentials: true,
   });
   return res;
 };
 
 export const loginController = async (formData: any) => {
-  const res = await api.post(AUTH_API + "/auth/login", formData, {
+  const res = await api.post(AUTH_API + '/auth/login', formData, {
     withCredentials: true,
   });
   return res;
 };
 
 export const logoutController = async () => {
-  const res = await api.get(AUTH_API + "/auth/logout", {
+  const res = await api.get(AUTH_API + '/auth/logout', {
     withCredentials: true,
   });
 
@@ -25,7 +25,7 @@ export const logoutController = async () => {
 };
 
 export const getRefreshToken = async () => {
-  const res = await api.get(AUTH_API + "/auth/refresh-token", {
+  const res = await api.get(AUTH_API + '/auth/refresh-token', {
     withCredentials: true,
   });
 
@@ -33,17 +33,17 @@ export const getRefreshToken = async () => {
 };
 
 export const getUserController = async () => {
-  const res = await api.get(AUTH_API + "/auth/me", {
+  const res = await api.get(AUTH_API + '/auth/me', {
     withCredentials: true,
   });
 
-  console.log("RES : ", res);
+  console.log('RES : ', res);
 
   return res;
 };
 
 export const getOtpStatus = async () => {
-  const res = await api.get(AUTH_API + "/auth/getOtpStatus", {
+  const res = await api.get(AUTH_API + '/auth/getOtpStatus', {
     withCredentials: true,
   });
 
@@ -51,7 +51,7 @@ export const getOtpStatus = async () => {
 };
 
 export const sendEmailVerifictionOtp = async (formData: any) => {
-  const res = await api.get(AUTH_API + "/auth/generateOTP", {
+  const res = await api.get(AUTH_API + '/auth/generateOTP', {
     withCredentials: true,
   });
 
@@ -59,17 +59,25 @@ export const sendEmailVerifictionOtp = async (formData: any) => {
 };
 
 export const otpVerification = async (formData: any) => {
-  const res = await api.post(AUTH_API + "/auth/verifyOTP", formData, {
+  const res = await api.post(AUTH_API + '/auth/verifyOTP', formData, {
     withCredentials: true,
   });
 
-  console.log("OTP VERIFY DATA : ", res);
+  console.log('OTP VERIFY DATA : ', res);
 
   return res;
 };
 
 export const routeInfo = async () => {
-  const res = await api.get(AUTH_API + "/auth/routeInfo", {
+  const res = await api.get(AUTH_API + '/auth/routeInfo', {
     withCredentials: true,
   });
+};
+
+export const getPermission = async () => {
+  const res = await api.get(AUTH_API + '/permission/get-permissions', {
+    withCredentials: true,
+  });
+
+  return res;
 };
