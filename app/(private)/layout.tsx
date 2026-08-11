@@ -25,6 +25,8 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from 'sonner';
 import AuthGuard from '@/components/auth/AuthGurard';
+import PrivateRouteAuthGuard from '@/components/auth/PrivateRouteAuthGuard';
+import Header from '@/components/Header';
 
 export default function PrivateRouteLayout({
   children,
@@ -32,14 +34,25 @@ export default function PrivateRouteLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // <AuthGuard>
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <div className="px-4">{children}</div>
+        <PrivateRouteAuthGuard>
+          <div className="h-screen flex flex-col px-6">
+            <Header
+              breadCrumbLinks={[
+                { title: 'Home', link: '' },
+                { title: 'Products', link: '/dashboard' },
+              ]}
+            />
+
+            <div className="flex-1 bg-amber-100 mb-4">
+              <div className="w-full h-full">{children}</div>
+            </div>
+          </div>
+        </PrivateRouteAuthGuard>
         <Toaster />
       </SidebarInset>
     </SidebarProvider>
-    // </AuthGuard>
   );
 }

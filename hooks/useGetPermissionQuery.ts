@@ -4,8 +4,13 @@ import { getPermission } from '@/lib/services/authService';
 import { handleAPICall } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
+import { boolean, string } from 'zod';
 
-const useGetPermissionQuery = () => {
+type Options = {
+  [key: string]: string | boolean | number | any;
+};
+
+const useGetPermissionQuery = (options?: Options) => {
   const { data, isPending, isError, error } = useQuery({
     queryKey: ['user-permission'],
     queryFn: () => handleAPICall('', getPermission),
@@ -15,6 +20,7 @@ const useGetPermissionQuery = () => {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     refetchOnMount: false,
+    ...options,
   });
 
   return { permissions: data?.data, isPending, isError };

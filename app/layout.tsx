@@ -8,6 +8,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import QueryClientComponentProvider from '@/hooks/QueryClientComponentProvider';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import LoadingScreen from '@/components/ui/LoadingScreen';
+import AuthGuard from '@/components/auth/AuthGurard';
 
 const spaceGrotesk = Space_Grotesk({
   variable: '--font-space-grotesk',
@@ -53,7 +54,7 @@ export default function RootLayout({
         >
           <QueryClientComponentProvider>
             <TooltipProvider>
-              {children}
+              <AuthGuard>{children}</AuthGuard>
               <Toaster />
               {/* <LoadingScreen /> */}
             </TooltipProvider>

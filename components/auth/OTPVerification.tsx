@@ -1,58 +1,91 @@
-"use client";
-import { usePathname, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { Input } from "../ui/input";
+'use client';
+import { usePathname, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { Input } from '../ui/input';
 // import useAuthQuery from "@/lib/queries/auth/useAuthQuery";
-import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
-import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
-import { Controller, Form, useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { OTP_TYPE } from "@/lib/constant";
+import { Button } from '../ui/button';
+import { useRouter } from 'next/navigation';
+import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '../ui/input-otp';
+import { Controller, Form, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { OTP_TYPE } from '@/lib/constant';
 import {
   _,
   getLocalStoageIeem,
   handleAPICall,
   leftFillNum,
   timer,
-} from "@/lib/utils";
+} from '@/lib/utils';
 import {
   getOtpStatus,
   getUserController,
   otpVerification,
   sendEmailVerifictionOtp,
-} from "@/lib/services/authService";
-import { InputGroup, InputGroupInput } from "../ui/input-group";
+} from '@/lib/services/authService';
+import { InputGroup, InputGroupInput } from '../ui/input-group';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import useAuthQuery from "@/hooks/useAuthQuery";
-import useMutationHook from "@/hooks/useMutationHook";
-import useQueryHook from "@/hooks/useQueryHook";
-import { time } from "console";
-import { toast } from "sonner";
+} from '../ui/card';
+import useAuthQuery from '@/hooks/useAuthQuery';
+import useMutationHook from '@/hooks/useMutationHook';
+import useQueryHook from '@/hooks/useQueryHook';
+import { time } from 'console';
+import { toast } from 'sonner';
+import { Skeleton } from '../ui/skeleton';
 // import toast from "react-hot-toast";
 // import { DialogDescription, DialogTitle } from "../ui/dialog";
 
+const OtpVerficationSeklton = () => {
+  return (
+    <div className="w-full ">
+      <Card className="border-none">
+        <CardHeader>
+          <CardTitle className="font-extrabold">
+            <Skeleton className="w-32 h-5" />
+          </CardTitle>
+          <CardDescription>
+            <Skeleton className="w-22 h-4 my-2" />
+            <Skeleton className="w-54 h-4" />
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="w-full">
+          <Skeleton className="w-32 h-4 mb-2" />
+          <div className="flex gap-2">
+            <Skeleton className="flex-1 h-12" />
+            <Skeleton className="flex-1 h-12" />
+            <Skeleton className="flex-1 h-12" />
+            <Skeleton className="flex-1 h-12" />
+            <Skeleton className="flex-1 h-12" />
+            <Skeleton className="flex-1 h-12" />
+          </div>
+          <div className="flex justify-end items-center mt-4">
+            <Skeleton className="w-22 h-10" />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
 function OTPVerification() {
-  console.log("USER EMAIL : ", getLocalStoageIeem("user-email"));
+  console.log('USER EMAIL : ', getLocalStoageIeem('user-email'));
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const route = useRouter();
-  const [screen, setScreen] = useState("email");
+  const [screen, setScreen] = useState('email');
 
   const router = useRouter();
 
   const { data, isPending, isSuccess, isError, error } = useQuery({
-    queryKey: ["otp-info"],
+    queryKey: ['otp-info'],
     queryFn: () => handleAPICall(undefined, getOtpStatus),
     retry: false,
     gcTime: 0,
@@ -71,7 +104,7 @@ function OTPVerification() {
 
       if (err?.message) {
         toast.error(err.message);
-        console.log("STATUS QUERY:", err);
+        console.log('STATUS QUERY:', err);
       }
     }
 
@@ -92,7 +125,7 @@ function OTPVerification() {
   useEffect(() => {
     if (data?.data?.screen) {
       setScreen(data?.data?.screen);
-      console.log("DATA : ", data?.data);
+      console.log('DATA : ', data?.data);
       route.replace(
         `${pathname}?verify-email=true&verify=${data?.data?.screen.trim()}`,
       );
@@ -173,18 +206,18 @@ const formSchema = z.object({
   otp: z
     .string()
     .min(6, {
-      message: "OTP must be of 6 numbers",
+      message: 'OTP must be of 6 numbers',
     })
     .max(6, {
-      message: "OTP must be of 6 numbers",
+      message: 'OTP must be of 6 numbers',
     }),
 });
 
 const OtpVerify = () => {
   // User Info
-  const { user } = useAuthQuery();
+  const { user, isPending: userPending, isError: userError } = useAuthQuery();
 
-  console.log("USER INFO CACHED : ", user);
+  console.log('USER INFO CACHED : ', user);
 
   const route = useRouter();
   const pathname = usePathname();
@@ -204,9 +237,9 @@ const OtpVerify = () => {
 
   const form = useForm({
     resolver: zodResolver(formSchema),
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      otp: "",
+      otp: '',
     },
   });
 
@@ -216,14 +249,15 @@ const OtpVerify = () => {
     isError,
     error,
   } = useQueryHook({
-    queryKey: ["otp-info"],
+    queryKey: ['otp-info'],
     queryFunction: getOtpStatus,
-    params: "",
+    params: '',
     retry: false,
     gcTime: 0,
+    enabled: !!user,
   });
 
-  console.log("OTP STATUS DATA : ", otpData);
+  console.log('OTP STATUS DATA : ', otpData);
 
   const {
     mutate: resendMutate,
@@ -232,8 +266,8 @@ const OtpVerify = () => {
   } = useMutation({
     mutationFn: () => handleAPICall(null, sendEmailVerifictionOtp),
     onSuccess: async (response) => {
-      console.log("RESPONSE : ", response);
-      queryClient.invalidateQueries({ queryKey: ["otp-info"] });
+      console.log('RESPONSE : ', response);
+      queryClient.invalidateQueries({ queryKey: ['otp-info'] });
       setTimeLeft({
         minutes: null,
         seconds: null,
@@ -243,7 +277,7 @@ const OtpVerify = () => {
     },
     onError: (error) => {
       toast.error(
-        error.message || "Something went wrong, please try again later",
+        error.message || 'Something went wrong, please try again later',
       );
     },
   });
@@ -251,7 +285,7 @@ const OtpVerify = () => {
   // console.log("otpData : ", otpData, otpData?.data?.is_otp_active);
 
   useEffect(() => {
-    console.log("OTPDATA : ", otpData?.data?.can_resend_in);
+    console.log('OTPDATA : ', otpData?.data?.can_resend_in);
     setOtpAttempts(otpData?.data?.otp_attempts);
     // setExpirationTime(
     //   otpData?.data?.is_otp_active ? otpData?.data?.expires_at : null,
@@ -298,13 +332,13 @@ const OtpVerify = () => {
     return () => clearInterval(interval);
   }, [expirationTime]);
 
-  console.log("TIME : ", timeLeft);
+  console.log('TIME : ', timeLeft);
 
   const { mutate, isPending, data } = useMutationHook(
     otpVerification,
     [],
     (response) => {
-      console.log("RESPONSE : ", response);
+      console.log('RESPONSE : ', response);
       // queryClient.invalidateQueries({ queryKey: ["otp-info"] });
 
       const redirectTo = response?.data?.redirectTo ?? response?.redirectTo;
@@ -313,26 +347,30 @@ const OtpVerify = () => {
       }
     },
     (error) => {
-      console.log("ERROR PAYLOAD : ", error?.data);
-      queryClient.invalidateQueries({ queryKey: ["otp-info"] });
+      console.log('ERROR PAYLOAD : ', error?.data);
+      queryClient.invalidateQueries({ queryKey: ['otp-info'] });
     },
   );
 
-  console.log("VERIFICATION DATA : ", data);
+  console.log('VERIFICATION DATA : ', data);
 
   function onSubmit(formData: z.infer<typeof formSchema>) {
-    console.log("✅ SUBMIT TRIGGERED", formData);
+    console.log('✅ SUBMIT TRIGGERED', formData);
     mutate(formData);
   }
 
   console.log(form.getValues());
+
+  if (userPending || otpPending) {
+    return <OtpVerficationSeklton />;
+  }
   return (
     <div className="w-full">
       <Card className="border-none">
         <CardHeader>
           <CardTitle className="font-extrabold">Enter OTP</CardTitle>
           <CardDescription>
-            We’ve sent an OTP to {user?.email ?? "Error Fetching User Info"}
+            We’ve sent an OTP to {user?.email ?? 'Error Fetching User Info'}
           </CardDescription>
         </CardHeader>
         <CardContent className="w-full">
@@ -347,7 +385,7 @@ const OtpVerify = () => {
                       htmlFor="otp"
                       className="flex justify-between items-center"
                     >
-                      Verification code{" "}
+                      Verification code{' '}
                       {otpPending ? (
                         <div>Loading..</div>
                       ) : (
@@ -420,9 +458,9 @@ const OtpVerify = () => {
             <div className="flex justify-end items-center">
               <Button
                 type="submit"
-                disabled={isPending || form.watch("otp")?.length !== 6}
+                disabled={isPending || form.watch('otp')?.length !== 6}
               >
-                {isPending ? "Verifying..." : "Verify"}
+                {isPending ? 'Verifying...' : 'Verify'}
               </Button>
             </div>
           </form>

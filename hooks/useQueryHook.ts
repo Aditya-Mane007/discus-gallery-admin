@@ -46,6 +46,7 @@ function useQueryHook<TParams = any, TResponse = any>({
     staleTime,
     retry,
     gcTime,
+    
   });
 
   useEffect(() => {
