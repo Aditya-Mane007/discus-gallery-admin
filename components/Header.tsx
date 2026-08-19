@@ -1,11 +1,11 @@
-import React from "react";
+import React from 'react';
 
-import { Separator } from "@/components/ui/separator";
+import { Separator } from '@/components/ui/separator';
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar";
+} from '@/components/ui/sidebar';
 
 import {
   Breadcrumb,
@@ -14,7 +14,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from '@/components/ui/breadcrumb';
 
 function Header({
   breadCrumbLinks,

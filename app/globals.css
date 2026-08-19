@@ -1,8 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap');
 
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -105,9 +105,9 @@ p {
   --sidebar-accent-foreground: oklch(0.25 0.04 211.5);
   --sidebar-border: oklch(0.925 0.007 211.5);
   --sidebar-ring: oklch(0.925 0.007 211.5);
-  --font-grotesk: "Space Grotesk", sans-serif;
-  --font-bricolage: "Bricolage Grotesque", sans-serif;
-  --font-heading: "Bricolage Grotesque", sans-serif;
+  --font-grotesk: 'Space Grotesk', sans-serif;
+  --font-bricolage: 'Bricolage Grotesque', sans-serif;
+  --font-heading: 'Bricolage Grotesque', sans-serif;
   --radius: 0.25rem;
   --shadow-2xs: 0 1px 0 0 oklch(0.55 0.02 211.5 / 0.05);
   --shadow-xs: 0 1px 2px 0 oklch(0.55 0.02 211.5 / 0.05);

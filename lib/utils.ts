@@ -198,5 +198,6 @@ export const useRequiredPermission = (permission: string) => {
   return {
     isLoading: false,
     isAllowed: permissionDoc?.[permission] === true,
+    permissionDoc,
   };
 };

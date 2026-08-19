@@ -1,19 +1,19 @@
 import PermissionAllowed from '@/components/auth/PermissionAllowed';
 import PrivatePageLayout from '@/components/auth/PrivatePageLayout';
-import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import React from 'react';
 
 function page() {
   return (
     <PrivatePageLayout
       breadCrumbLinks={[
         { title: 'IAM', link: '/iam' },
-        { title: 'Users', link: '/iam/users' },
+        { title: 'Users Groups', link: '/iam/users-groups' },
       ]}
     >
-      Users Page
-      <PermissionAllowed permission="user:create">
-        <Button>Create user</Button>
+      User Group Page
+      <PermissionAllowed permission="user-group:create">
+        <Button>Create user group</Button>
       </PermissionAllowed>
     </PrivatePageLayout>
   );

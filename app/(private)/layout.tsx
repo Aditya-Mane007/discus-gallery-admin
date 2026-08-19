@@ -38,18 +38,7 @@ export default function PrivateRouteLayout({
       <AppSidebar />
       <SidebarInset>
         <PrivateRouteAuthGuard>
-          <div className="h-screen flex flex-col px-6">
-            <Header
-              breadCrumbLinks={[
-                { title: 'Home', link: '' },
-                { title: 'Products', link: '/dashboard' },
-              ]}
-            />
-
-            <div className="flex-1 bg-amber-100 mb-4">
-              <div className="w-full h-full">{children}</div>
-            </div>
-          </div>
+          <div className="w-full h-full px-4 pb-2">{children}</div>
         </PrivateRouteAuthGuard>
         <Toaster />
       </SidebarInset>

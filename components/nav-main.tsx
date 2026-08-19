@@ -40,7 +40,7 @@ export function NavMain({
   return (
     <>
       {items.map((item) => (
-        <SidebarGroup>
+        <SidebarGroup key={item?.title}>
           <SidebarGroupLabel className="truncate">
             {item?.groupLabel}
           </SidebarGroupLabel>
