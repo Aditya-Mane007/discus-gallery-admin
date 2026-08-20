@@ -106,6 +106,7 @@ export function NavMainSkeleton() {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { permissions, isPending } = useGetPermissionQuery();
+  // const {organizations} =
 
   const [permissionsData, setPermissionsData] = React.useState<
     Record<string, unknown>
