@@ -178,11 +178,13 @@ type Permission = {
 export const useRequiredPermission = (permission: string) => {
   const { user, isPending: authIsPending } = useAuthQuery();
 
-  const { permissions, isPending: permissionIsPending } = useGetPermissionQuery(
-    {
-      enabled: !!user,
-    },
-  );
+  const {
+    permissions,
+    isPending: permissionIsPending,
+    totalPermission,
+  } = useGetPermissionQuery({
+    enabled: !!user,
+  });
 
   const permissionDoc = permissions?.policy_document?.permissions;
 
@@ -199,5 +201,7 @@ export const useRequiredPermission = (permission: string) => {
     isLoading: false,
     isAllowed: permissionDoc?.[permission] === true,
     permissionDoc,
+    noAccess: totalPermission < 1,
+    user,
   };
 };

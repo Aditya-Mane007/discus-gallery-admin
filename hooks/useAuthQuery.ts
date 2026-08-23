@@ -16,7 +16,7 @@ function useAuthQuery() {
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    refetchOnMount: false,
+    // refetchOnMount: false,
   });
 
   useEffect(() => {

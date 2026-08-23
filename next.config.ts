@@ -5,6 +5,15 @@ const nextConfig: NextConfig = {
   experimental: {
     authInterrupts: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'discusgallery.in',
+        port: '',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

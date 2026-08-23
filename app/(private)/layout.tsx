@@ -35,13 +35,13 @@ export default function PrivateRouteLayout({
 }>) {
   return (
     <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <PrivateRouteAuthGuard>
+      <PrivateRouteAuthGuard>
+        <AppSidebar />
+        <SidebarInset>
           <div className="w-full h-full px-4 pb-2">{children}</div>
-        </PrivateRouteAuthGuard>
-        <Toaster />
-      </SidebarInset>
+          <Toaster />
+        </SidebarInset>
+      </PrivateRouteAuthGuard>
     </SidebarProvider>
   );
 }

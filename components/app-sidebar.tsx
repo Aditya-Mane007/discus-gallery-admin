@@ -1,7 +1,4 @@
 'use client';
-
-import * as React from 'react';
-
 import { NavMain } from '@/components/nav-main';
 import { NavProjects } from '@/components/nav-projects';
 import { NavUser } from '@/components/nav-user';
@@ -49,6 +46,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from './ui/collapsible';
+import useAuthQuery from '@/hooks/useAuthQuery';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { PermissionContext } from './auth/PrivateRouteAuthGuard';
 
 export function NavMainSkeleton() {
   return (
@@ -105,37 +105,25 @@ export function NavMainSkeleton() {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { permissions, isPending } = useGetPermissionQuery();
-  // const {organizations} =
+  const userInfo = useContext(PermissionContext);
 
-  const [permissionsData, setPermissionsData] = React.useState<
+  console.log('userInfo : ', userInfo);
+
+  const [permissionsData, setPermissionsData] = useState<
     Record<string, unknown>
   >({});
 
-  const data = React.useMemo(
+  const [orgData, setOrgData] = useState([]);
+
+  console.log('ORG Data : ', orgData);
+
+  const data = useMemo(
     () => ({
       user: {
         name: 'shadcn',
         email: 'm@example.com',
         avatar: '/avatars/shadcn.jpg',
       },
-      teams: [
-        {
-          name: 'Acme Inc',
-          logo: <GalleryVerticalEndIcon />,
-          plan: 'Enterprise',
-        },
-        {
-          name: 'Acme Corp.',
-          logo: <AudioLinesIcon />,
-          plan: 'Startup',
-        },
-        {
-          name: 'Evil Corp.',
-          logo: <TerminalIcon />,
-          plan: 'Free',
-        },
-      ],
       navMain: [
         {
           title: 'IAM',
@@ -194,7 +182,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             },
             {
               title: 'Sessions',
-              url: '/iam/sessions',
+              url: '/iam/session',
               permission: permissionsData['session:read'],
               icon: <History />,
             },
@@ -205,23 +193,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     [permissionsData],
   );
 
-  React.useEffect(() => {
-    setPermissionsData({ ...permissions?.policy_document?.permissions });
-  }, [permissions]);
+  useEffect(() => {
+    setPermissionsData(userInfo?.permissionDoc);
+    setOrgData(userInfo?.user?.orgData || []);
+  }, [userInfo]);
 
-  if (isPending) {
+  if (userInfo?.isLoading) {
     return <NavMainSkeleton />;
   }
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher teams={orgData} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain as any} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userInfo.user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

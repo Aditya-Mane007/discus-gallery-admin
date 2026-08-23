@@ -8,10 +8,10 @@ function page() {
     <PrivatePageLayout
       breadCrumbLinks={[
         { title: 'IAM', link: '/iam' },
-        { title: 'Membership', link: '/iam/memberships' },
+        { title: 'Session', link: '/iam/session' },
       ]}
     >
-      Memberships Page
+      Session Page
       <PermissionAllowed permission="user-groups:create">
         <Button>Create user group</Button>
       </PermissionAllowed>
