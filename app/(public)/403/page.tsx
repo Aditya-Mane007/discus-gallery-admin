@@ -6,10 +6,13 @@ export default function ForbiddenPage() {
     <div className="flex min-h-screen flex-col items-center justify-center">
       <h1 className="text-6xl font-bold">403</h1>
 
-      <h2 className="mt-4 text-2xl font-semibold">Access Denied</h2>
+      <h2 className="mt-4 text-2xl font-semibold">
+        You Don't Have Access to This Page
+      </h2>
 
-      <p className="mt-2 text-muted-foreground">
-        You don't have permission to access this page.
+      <p className="md:w-[50%] text-center mt-2 text-muted-foreground">
+        This page requires permissions your account doesn't currently have.
+        Reach out to your administrator if you think you should have access.
       </p>
 
       <Button className="my-4">
