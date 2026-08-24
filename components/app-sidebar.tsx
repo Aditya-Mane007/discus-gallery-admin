@@ -131,6 +131,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           icon: <TerminalSquareIcon />,
           isActive: false,
           groupLabel: 'Identity and Access Management',
+          requiredPermissions: [
+            'user:read',
+            'user-group:read',
+            'role:read',
+            'role-group:read',
+            'policy:read',
+            'organization:read',
+            'invitation:read',
+            'session:read',
+          ],
           items: [
             {
               title: 'Users',
@@ -204,10 +214,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={orgData} />
+        <TeamSwitcher
+          teams={orgData}
+          currentSelectedMembeship={userInfo?.user?.currentMembershipId}
+        />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain as any} />
+        <NavMain
+          permissionsData={permissionsData}
+          items={data.navMain as any}
+        />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={userInfo.user} />

@@ -17,6 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { Badge } from '@/components/ui/badge';
 import { ChevronsUpDownIcon, PlusIcon } from 'lucide-react';
 import Image from 'next/image';
 import useMutationHook from '@/hooks/useMutationHook';
@@ -25,6 +26,7 @@ import { useRouter } from 'next/navigation';
 
 export function TeamSwitcher({
   teams,
+  currentSelectedMembeship,
 }: {
   teams: {
     name: string;
@@ -32,17 +34,23 @@ export function TeamSwitcher({
     plan: string;
     organization_membership_id: string;
   }[];
+  activeTeam: string;
 }) {
   console.log('TEAMS : ', teams);
   const { isMobile } = useSidebar();
   const [activeTeam, setActiveTeam] = React.useState(teams[0]);
-  console.log(activeTeam);
+  // console.log(activeTeam);
 
   React.useEffect(() => {
     if (teams) {
-      setActiveTeam(teams[0]);
+      setActiveTeam(
+        (teams || []).filter(
+          (team) =>
+            team?.organization_membership_id == currentSelectedMembeship,
+        )[0],
+      );
     }
-  }, [teams]);
+  }, [teams, currentSelectedMembeship]);
 
   const router = useRouter();
 
@@ -105,6 +113,10 @@ export function TeamSwitcher({
                 {teams.map((team, index) => (
                   <DropdownMenuItem
                     key={team.name}
+                    disabled={
+                      team?.organization_membership_id ==
+                      currentSelectedMembeship
+                    }
                     onClick={() => {
                       setActiveTeam(team);
                       changeUserOrganization(team?.organization_membership_id);
@@ -120,7 +132,11 @@ export function TeamSwitcher({
                       />
                     </div>
                     {team.name}
-                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                    <DropdownMenuShortcut className="flex ">
+                      {/* ⌘{index + 1} */}
+                      {team?.organization_membership_id ==
+                        currentSelectedMembeship && <Badge>Active</Badge>}
+                    </DropdownMenuShortcut>
                   </DropdownMenuItem>
                 ))}
               </>

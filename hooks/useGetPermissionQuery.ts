@@ -26,13 +26,19 @@ const useGetPermissionQuery = (options?: Options) => {
     ...options,
   });
 
+  console.log(
+    Object.entries(data?.data?.policy_document?.permissions || {}).filter(
+      ([key, value]) => !key.startsWith('public-page'),
+    ),
+  );
   return {
     permissions: data?.data,
     isPending,
     isError,
     totalPermission:
-      Object.entries(data?.data?.policy_document?.permissions || {}).length ??
-      0,
+      Object.entries(data?.data?.policy_document?.permissions || {}).filter(
+        ([key]) => !key.startsWith('public-page'),
+      ).length ?? 0,
   };
 };
 

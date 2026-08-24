@@ -21,6 +21,7 @@ import React from 'react';
 
 export function NavMain({
   items,
+  permissionsData,
 }: {
   items: {
     title: string;
@@ -36,51 +37,64 @@ export function NavMain({
       permission?: boolean;
     }[];
   }[];
+  permissionsData: {
+    [key: string]: boolean;
+  };
 }) {
+  console.log(
+    'PERMISSION DATA :',
+    permissionsData.hasOwnProperty('invitation:cancel'),
+  );
   return (
     <>
       {items.map((item) => (
         <SidebarGroup key={item?.title}>
-          <SidebarGroupLabel className="truncate">
-            {item?.groupLabel}
-          </SidebarGroupLabel>
-          <SidebarMenu>
-            <Collapsible
-              key={item.title}
-              asChild
-              defaultOpen={item.isActive}
-              className="group/collapsible"
-            >
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip={item.title}>
-                    {item.icon}
-                    <span>{item.title}</span>
-                    <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    {item.items?.map((subItem) => {
-                      return (
-                        <SidebarMenuSubItem
-                          key={subItem.title}
-                          className={cn(subItem?.permission && 'none')}
-                        >
-                          <SidebarMenuSubButton asChild>
-                            <a href={subItem.url}>
-                              {subItem.icon}
-                              <span>{subItem.title}</span>
-                            </a>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      );
-                    })}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </SidebarMenuItem>
-            </Collapsible>
-          </SidebarMenu>
+          {(item?.requiredPermissions || []).filter((key) =>
+            permissionsData.hasOwnProperty(key),
+          ).length > 1 && (
+            <>
+              <SidebarGroupLabel className="truncate">
+                {item?.groupLabel}
+              </SidebarGroupLabel>
+              <SidebarMenu>
+                <Collapsible
+                  key={item.title}
+                  asChild
+                  defaultOpen={item.isActive}
+                  className="group/collapsible"
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton tooltip={item.title}>
+                        {item.icon}
+                        <span>{item.title}</span>
+                        <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {item.items?.map((subItem) => {
+                          return (
+                            <SidebarMenuSubItem
+                              key={subItem.title}
+                              className={cn(subItem?.permission && 'none')}
+                            >
+                              <SidebarMenuSubButton asChild>
+                                <a href={subItem.url}>
+                                  {subItem.icon}
+                                  <span>{subItem.title}</span>
+                                </a>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          );
+                        })}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              </SidebarMenu>
+            </>
+          )}
         </SidebarGroup>
       ))}
     </>
