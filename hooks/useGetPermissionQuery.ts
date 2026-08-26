@@ -16,13 +16,13 @@ const useGetPermissionQuery = (options?: Options) => {
   const { data, isPending, isError, error } = useQuery({
     queryKey: ['user-permission'],
     queryFn: () => handleAPICall('', getPermission),
-    staleTime: Infinity,
-    gcTime: Infinity, // keep it in memory while the app is open
+    staleTime: 5 * 60 * 1000, // 5 minutes - refetch after this
+    gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache
     retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    // refetchOnMount: false,
-    enabled: !user,
+    refetchOnWindowFocus: true, // refetch when user returns to tab
+    refetchOnReconnect: true, // refetch on reconnect
+    refetchOnMount: true, // refetch when component mounts (back navigation)
+    enabled: !!user,
     ...options,
   });
 

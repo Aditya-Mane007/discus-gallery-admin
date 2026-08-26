@@ -34,12 +34,13 @@ export function TeamSwitcher({
     plan: string;
     organization_membership_id: string;
   }[];
-  activeTeam: string;
+  currentSelectedMembeship: string;
 }) {
   console.log('TEAMS : ', teams);
   const { isMobile } = useSidebar();
-  const [activeTeam, setActiveTeam] = React.useState(teams[0]);
-  // console.log(activeTeam);
+  const [activeTeam, setActiveTeam] = React.useState({});
+  console.log('activeTeam : ', activeTeam);
+  console.log('currentSelectedMembeship : ', currentSelectedMembeship);
 
   React.useEffect(() => {
     if (teams) {
@@ -50,7 +51,7 @@ export function TeamSwitcher({
         )[0],
       );
     }
-  }, [teams, currentSelectedMembeship]);
+  }, [teams, currentSelectedMembeship, activeTeam]);
 
   const router = useRouter();
 
@@ -70,7 +71,7 @@ export function TeamSwitcher({
   };
 
   if (!activeTeam) {
-    return null;
+    return <p>Teams Loading...</p>;
   }
 
   return (
@@ -110,7 +111,7 @@ export function TeamSwitcher({
               <p>Switching...</p>
             ) : (
               <>
-                {teams.map((team, index) => (
+                {(teams || []).map((team, index) => (
                   <DropdownMenuItem
                     key={team.name}
                     disabled={
@@ -133,7 +134,6 @@ export function TeamSwitcher({
                     </div>
                     {team.name}
                     <DropdownMenuShortcut className="flex ">
-                      {/* ⌘{index + 1} */}
                       {team?.organization_membership_id ==
                         currentSelectedMembeship && <Badge>Active</Badge>}
                     </DropdownMenuShortcut>

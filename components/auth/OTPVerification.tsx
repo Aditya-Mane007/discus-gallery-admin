@@ -339,7 +339,9 @@ const OtpVerify = () => {
     [],
     (response) => {
       console.log('RESPONSE : ', response);
-      // queryClient.invalidateQueries({ queryKey: ["otp-info"] });
+      // Invalidate user cache so fresh /auth/me is called on redirected page
+      queryClient.invalidateQueries({ queryKey: ['user-info'] });
+      // queryClient.invalidateQueries({ queryKey: ['otp-info'] });
 
       const redirectTo = response?.data?.redirectTo ?? response?.redirectTo;
       if (redirectTo) {

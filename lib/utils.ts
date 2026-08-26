@@ -182,9 +182,7 @@ export const useRequiredPermission = (permission: string) => {
     permissions,
     isPending: permissionIsPending,
     totalPermission,
-  } = useGetPermissionQuery({
-    enabled: !!user,
-  });
+  } = useGetPermissionQuery();
 
   const permissionDoc = permissions?.policy_document?.permissions;
 

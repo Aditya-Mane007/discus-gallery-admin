@@ -38,12 +38,12 @@ api.interceptors.response.use(
       if (typeof window !== 'undefined') {
         const temSessionId = getCookie('tem_session_id');
         const isOnVerifyPage = window.location.pathname.includes('/verify');
-        // const isSessionExpiredMsg = error.response?.data?.message
-        //   ?.toLowerCase()
-        //   ?.includes("expire");
+        const isSessionExpiredMsg = error.response?.data?.message
+          ?.toLowerCase()
+          ?.includes('expire');
 
-        // if (temSessionId || isOnVerifyPage || isSessionExpiredMsg) {
-        if (temSessionId || isOnVerifyPage) {
+        if (temSessionId || isOnVerifyPage || isSessionExpiredMsg) {
+          // if (temSessionId || isOnVerifyPage) {
           window.location.href = '/login';
           return Promise.reject(error);
         }
@@ -72,7 +72,9 @@ api.interceptors.response.use(
         });
 
         processQueue(null);
-
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
         return api(originalRequest);
       } catch (err) {
         processQueue(err);
