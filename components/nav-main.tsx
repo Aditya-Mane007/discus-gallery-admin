@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { ChevronRightIcon } from 'lucide-react';
+import Link from 'next/link';
 import React from 'react';
 
 export function NavMain({
@@ -80,10 +81,10 @@ export function NavMain({
                               className={cn(subItem?.permission && 'none')}
                             >
                               <SidebarMenuSubButton asChild>
-                                <a href={subItem.url}>
+                                <Link href={subItem.url}>
                                   {subItem.icon}
                                   <span>{subItem.title}</span>
-                                </a>
+                                </Link>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           );
