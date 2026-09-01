@@ -1,14 +1,14 @@
-import PermissionAllowed from '@/components/auth/PermissionAllowed';
-import PrivatePageLayout from '@/components/auth/PrivatePageLayout';
-import { Button } from '@/components/ui/button';
-import React from 'react';
+import PermissionAllowed from "@/components/auth/PermissionAllowed";
+import PrivatePageLayout from "@/components/auth/PrivatePageLayout";
+import { Button } from "@/components/ui/button";
+import React from "react";
 
 function page() {
   return (
     <PrivatePageLayout
       breadCrumbLinks={[
-        { title: 'IAM', link: '/iam' },
-        { title: 'Users Groups', link: '/iam/users-groups' },
+        { title: "IAM", link: "/iam" },
+        { title: "Users Groups", link: "/iam/users-groups" },
       ]}
     >
       User Group Page

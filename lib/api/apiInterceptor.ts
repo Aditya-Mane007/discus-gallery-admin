@@ -38,9 +38,10 @@ api.interceptors.response.use(
       if (typeof window !== 'undefined') {
         const temSessionId = getCookie('tem_session_id');
         const isOnVerifyPage = window.location.pathname.includes('/verify');
-        const isSessionExpiredMsg = error.response?.data?.message
-          ?.toLowerCase()
-          ?.includes('expire');
+        const isSessionExpiredMsg =
+          error.response?.data?.code == 'SESSION_EXPIRED';
+
+        console.log('error : ', error?.response?.data);
 
         if (temSessionId || isOnVerifyPage || isSessionExpiredMsg) {
           // if (temSessionId || isOnVerifyPage) {
