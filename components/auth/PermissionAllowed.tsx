@@ -9,9 +9,11 @@ function PermissionAllowed({
   children: React.ReactNode;
   permission: string;
 }) {
-  const permissionDoc = useContext(PermissionContext) as
+  const { permissionDoc } = useContext(PermissionContext) as
     | Record<string, boolean>
     | undefined;
+
+  console.log('permissionDoc', permissionDoc);
 
   if (!permissionDoc?.[permission]) {
     return null;

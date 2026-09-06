@@ -9,6 +9,11 @@ import QueryClientComponentProvider from '@/hooks/QueryClientComponentProvider';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import AuthGuard from '@/components/auth/AuthGurard';
+import { TanStackDevtools } from '@tanstack/react-devtools';
+import {
+  tableDevtoolsPlugin,
+  useTanStackTableDevtools,
+} from '@tanstack/react-table-devtools';
 
 const spaceGrotesk = Space_Grotesk({
   variable: '--font-space-grotesk',
@@ -56,6 +61,7 @@ export default function RootLayout({
             <TooltipProvider>
               <AuthGuard>{children}</AuthGuard>
               <Toaster />
+              {/* <TanStackDevtools plugins={[tableDevtoolsPlugin()]} /> */}
               {/* <LoadingScreen /> */}
             </TooltipProvider>
             <ReactQueryDevtools initialIsOpen={false} />
