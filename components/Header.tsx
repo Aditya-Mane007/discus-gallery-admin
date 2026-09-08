@@ -22,7 +22,7 @@ function Header({
   breadCrumbLinks: { title: string; link: string }[];
 }) {
   return (
-    <header className="sticky top-0 bg-background flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+    <header className="z-50 sticky top-0 flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 bg-background">
       <div className="flex items-center gap-2">
         <SidebarTrigger className="-ml-2 cursor-pointer" />
         <Separator

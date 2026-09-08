@@ -30,17 +30,22 @@ export function TeamSwitcher({
 }: {
   teams: {
     name: string;
-    logo: string;
+    logo: null | string;
     plan: string;
     organization_membership_id: string;
   }[];
   currentSelectedMembeship: string;
 }) {
-  console.log('TEAMS : ', teams);
   const { isMobile } = useSidebar();
-  const [activeTeam, setActiveTeam] = React.useState({});
-  console.log('activeTeam : ', activeTeam);
-  console.log('currentSelectedMembeship : ', currentSelectedMembeship);
+  const [activeTeam, setActiveTeam] = React.useState<{
+    logo: string | null;
+    name: string;
+    plan: string;
+  }>({
+    logo: null,
+    name: '',
+    plan: '',
+  });
 
   React.useEffect(() => {
     if (teams) {
@@ -51,7 +56,7 @@ export function TeamSwitcher({
         )[0],
       );
     }
-  }, [teams, currentSelectedMembeship, activeTeam]);
+  }, [teams, currentSelectedMembeship]);
 
   const router = useRouter();
 
@@ -85,7 +90,7 @@ export function TeamSwitcher({
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <Image
-                  src={activeTeam?.logo}
+                  src={activeTeam?.logo ?? '/favicon.ico'}
                   alt={activeTeam?.name}
                   width={50}
                   height={50}
@@ -126,7 +131,7 @@ export function TeamSwitcher({
                   >
                     <div className="flex size-6 items-center justify-center rounded-md border">
                       <Image
-                        src={activeTeam?.logo}
+                        src={activeTeam?.logo ?? '/favicon.ico'}
                         alt={activeTeam?.name}
                         width={20}
                         height={20}
