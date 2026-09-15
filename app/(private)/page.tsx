@@ -1,36 +1,47 @@
 import PermissionAllowed from '@/components/auth/PermissionAllowed';
 import PrivatePageLayout from '@/components/auth/PrivatePageLayout';
-import { DataTableFeatures } from '@/components/data-table/data-table-features';
-import { DataTable, Payment } from '@/components/data-table/DataTable';
-import { makeData } from '@/components/data-table/makeData';
 import { Button } from '@/components/ui/button';
-import { createColumnHelper } from '@tanstack/react-table';
-import React from 'react';
 
-const columnHelper = createColumnHelper<DataTableFeatures, Payment>();
+import { columns, Payment } from '@/components/data-table/columns';
+import { DataTable } from '@/components/data-table/data-table';
+async function getData(): Promise<Payment[]> {
+  return [
+    {
+      id: '728ed52f',
+      amount: 100,
+      status: 'pending',
+      email: 'a@example.com',
+    },
+    {
+      id: '728ed52f',
+      amount: 100,
+      status: 'pending',
+      email: 'b@example.com',
+    },
+    {
+      id: '728ed52f',
+      amount: 100,
+      status: 'pending',
+      email: 'c@example.com',
+    },
+    {
+      id: '728ed52f',
+      amount: 100,
+      status: 'pending',
+      email: 'd@example.com',
+    },
+  ];
+}
 
-export const columns = columnHelper.columns([
-  columnHelper.accessor('firstName', {
-    header: 'First Name',
-  }),
-  columnHelper.accessor('lastName', {
-    header: 'Last Name',
-  }),
-  columnHelper.accessor('status', {
-    header: 'Status',
-  }),
-]);
+async function page() {
+  const data = await getData();
 
-function page() {
-  const data = React.useMemo(() => makeData(100), []);
-  console.log('data : ', data);
   return (
     <PrivatePageLayout breadCrumbLinks={[{ title: 'Home', link: '/' }]}>
-      {/* Home Page
       <PermissionAllowed permission="user:create">
         <Button>Create user</Button>
-      </PermissionAllowed> */}
-      <DataTable data={data} columns={columns} />
+      </PermissionAllowed>
+      <DataTable columns={columns} data={data} title="User Table" />
     </PrivatePageLayout>
   );
 }
