@@ -14,10 +14,11 @@ function PrivatePageLayout({
   breadCrumbLinks,
 }: PrivatePageLayoutProps) {
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
       <Header breadCrumbLinks={breadCrumbLinks} />
-
-      <div className="flex-1 h-full">{children}</div>
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+        {children}
+      </div>
     </div>
   );
 }

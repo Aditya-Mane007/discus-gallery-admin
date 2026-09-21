@@ -50,7 +50,7 @@ export default function RootLayout({
         'font-grotesk',
       )}
     >
-      <body className="min-h-full flex flex-col relative">
+      <body className="h-full min-h-0 flex flex-col relative">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
