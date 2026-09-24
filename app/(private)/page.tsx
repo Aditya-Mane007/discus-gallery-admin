@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 
 import { columns, Payment } from '@/components/data-table/columns';
 import { DataTable } from '@/components/data-table/data-table';
+
 async function getData(): Promise<Payment[]> {
   console.log('DATA FETCHED');
   return [
@@ -521,7 +522,12 @@ async function getData(): Promise<Payment[]> {
   ];
 }
 
-async function page() {
+interface PageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+async function page({ searchParams }: PageProps) {
+  console.log('SEARCH PARAMS : ', await searchParams);
   const data = await getData();
 
   return (

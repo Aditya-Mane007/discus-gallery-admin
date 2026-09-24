@@ -64,7 +64,7 @@ export default function RootLayout({
               {/* <TanStackDevtools plugins={[tableDevtoolsPlugin()]} /> */}
               {/* <LoadingScreen /> */}
             </TooltipProvider>
-            <ReactQueryDevtools initialIsOpen={false} />
+            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
           </QueryClientComponentProvider>
         </ThemeProvider>
       </body>
