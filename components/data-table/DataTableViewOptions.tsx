@@ -69,6 +69,7 @@ export function DataTableViewOptions<TData extends RowData>({
               getIsVisible: () => string | boolean | undefined;
               toggleVisibility: (arg0: boolean) => void;
             }) => {
+              console.log(column);
               return (
                 <DropdownMenuCheckboxItem
                   key={column.id}
@@ -77,7 +78,7 @@ export function DataTableViewOptions<TData extends RowData>({
                   onCheckedChange={(value) => column.toggleVisibility(!!value)}
                   onSelect={(event) => event.preventDefault()}
                 >
-                  {column.id}
+                  {column?.columnDef?.header}
                 </DropdownMenuCheckboxItem>
               );
             },
