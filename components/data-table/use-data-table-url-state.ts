@@ -27,7 +27,7 @@ export const useDataTableUrlState = () => {
 
   const pageIndex = Math.max(0, Number(searchParams.get('page') ?? '1') - 1);
   const pageSize = Math.max(
-    Number(searchParams.get('size') ?? DEFAULT_PAGE_SIZE),
+    Number(searchParams.get('pageSize') ?? DEFAULT_PAGE_SIZE),
   );
   const sortField = searchParams.get('sortBy') ?? undefined;
   const sortDir = searchParams.get('sortDir') ?? 'ASC';

@@ -8,6 +8,13 @@ import {
   TableQueryResult,
   useServerTableQuery,
 } from '@/hooks/use-server-table-query';
+import { createContext } from 'react';
+
+export const TableContext = createContext({
+  title: '',
+  rowCount: null,
+  rowSelect: false,
+});
 
 interface QueryDataTableProps<T> {
   title?: string;
@@ -29,8 +36,6 @@ export function QueryDataTable<T>({
     queryFn,
   });
 
-  console.log('DATA : ', data);
-
   if (isError) {
     return (
       <div className="p-4 text-sm text-destructive">
@@ -43,14 +48,15 @@ export function QueryDataTable<T>({
   const rows = data?.data ?? [];
   const rowCount = data?.meta?.total_records ?? 0;
   return (
-    <DataTable
-      title={title}
-      columns={columns}
-      data={rows ?? []}
-      rowCount={rowCount ?? 0}
-      rowSelect={rowSelect}
-      isLoading={isPending}
-      isRefetching={isFetching && !isPending}
-    />
+    <TableContext
+      value={{ title: title ?? '', rowCount, rowSelect: rowSelect ?? false }}
+    >
+      <DataTable
+        columns={columns}
+        data={rows}
+        isLoading={isPending}
+        isRefetching={isFetching && !isPending}
+      />
+    </TableContext>
   );
 }

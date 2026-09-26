@@ -14,6 +14,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import { type TasksTableFeatures } from './data-table-features';
+import {
+  ReactElement,
+  JSXElementConstructor,
+  ReactNode,
+  ReactPortal,
+  Key,
+} from 'react';
 
 export function DataTableViewOptions<TData extends RowData>({
   table,
@@ -32,26 +39,49 @@ export function DataTableViewOptions<TData extends RowData>({
           Columns
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[150px]">
+      <DropdownMenuContent align="end" className="w-37.5">
         {table
           .getAllColumns()
           .filter(
-            (column) =>
+            (column: { accessorFn: any; getCanHide: () => any }) =>
               typeof column.accessorFn !== 'undefined' && column.getCanHide(),
           )
-          .map((column) => {
-            return (
-              <DropdownMenuCheckboxItem
-                key={column.id}
-                className="capitalize"
-                checked={column.getIsVisible()}
-                onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                onSelect={(event) => event.preventDefault()}
-              >
-                {column.id}
-              </DropdownMenuCheckboxItem>
-            );
-          })}
+          .map(
+            (column: {
+              id:
+                | boolean
+                | ReactElement<unknown, string | JSXElementConstructor<any>>
+                | Iterable<ReactNode>
+                | Promise<
+                    | string
+                    | number
+                    | bigint
+                    | boolean
+                    | ReactPortal
+                    | ReactElement<unknown, string | JSXElementConstructor<any>>
+                    | Iterable<ReactNode>
+                    | null
+                    | undefined
+                  >
+                | Key
+                | null
+                | undefined;
+              getIsVisible: () => string | boolean | undefined;
+              toggleVisibility: (arg0: boolean) => void;
+            }) => {
+              return (
+                <DropdownMenuCheckboxItem
+                  key={column.id}
+                  className="capitalize"
+                  checked={column.getIsVisible()}
+                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                  onSelect={(event) => event.preventDefault()}
+                >
+                  {column.id}
+                </DropdownMenuCheckboxItem>
+              );
+            },
+          )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -15,8 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { type DataTableFeatures } from './data-table-features';
-import { DataTableColumnHeader } from './data-table-column-header';
+import { features } from './data-table-features';
 
 import { Badge } from '@/components/ui/badge';
 
@@ -32,25 +31,22 @@ export interface Module {
   total_records: string; // comes back as a string from the API, cast when sorting/displaying as a number
 }
 
-const columnHelper = createColumnHelper<Module>();
+const columnHelper = createColumnHelper<typeof features, Module>();
 
 export const columns = [
+  columnHelper.display({
+    id: 'Sr',
+    cell: (props) => '1',
+  }),
   columnHelper.accessor('name', {
     header: 'Name',
     cell: (info) => <span className="font-medium">{info.getValue()}</span>,
-    enableSorting: true,
   }),
   columnHelper.accessor('description', {
     header: 'Description',
     cell: (info) => (
       <span className="text-muted-foreground">{info.getValue()}</span>
     ),
-    enableSorting: false,
-  }),
-  columnHelper.accessor('total_records', {
-    header: 'Records',
-    cell: (info) => Number(info.getValue()).toLocaleString(),
-    enableSorting: true,
   }),
   columnHelper.accessor('is_system', {
     header: 'System',
@@ -59,7 +55,6 @@ export const columns = [
         {info.getValue() ? 'System' : 'Custom'}
       </Badge>
     ),
-    enableSorting: false,
   }),
   columnHelper.accessor('is_active', {
     header: 'Status',
@@ -67,15 +62,6 @@ export const columns = [
       <Badge variant={info.getValue() ? 'default' : 'destructive'}>
         {info.getValue() ? 'Active' : 'Inactive'}
       </Badge>
-    ),
-    enableSorting: true,
-  }),
-  columnHelper.display({
-    id: 'actions',
-    header: '',
-    cell: (info) => (
-      // wire up your row menu / edit-link here, using info.row.original.module_id
-      <span className="text-sm text-muted-foreground">•••</span>
     ),
   }),
 ];

@@ -1,16 +1,19 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useContext } from 'react';
 
 import {
   ColumnDef,
   columnVisibilityFeature,
+  ColumnVisibilityState,
   flexRender,
+  RowData,
   rowPaginationFeature,
   rowSelectionFeature,
   rowSortingFeature,
   tableFeatures,
   useTable,
 } from '@tanstack/react-table';
+import { useCreateAtom, useSelector } from '@tanstack/react-store';
 
 import { Input } from '@/components/ui/input';
 
@@ -29,6 +32,7 @@ import { DataTableViewOptions } from './DataTableViewOptions';
 import { useDataTableUrlState } from './use-data-table-url-state';
 import { usePathname, useRouter } from 'next/navigation';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
+import { TableContext } from './QueryDataTable';
 
 const features = tableFeatures({
   rowSortingFeature,
@@ -37,8 +41,7 @@ const features = tableFeatures({
   rowSelectionFeature,
 });
 
-interface DataTableProps<TData> {
-  title?: string;
+interface DataTableProps<TData extends RowData> {
   columns: ColumnDef<any, TData>[];
   data: TData[]; // just the current page's rows
   rowCount: number; // TOTAL rows across all pages, from the server
@@ -47,8 +50,7 @@ interface DataTableProps<TData> {
   isRefetching?: boolean;
 }
 
-export function DataTable<TData extends DataTableProps>({
-  title,
+export function DataTable<TData extends RowData>({
   columns,
   data,
   rowCount,
@@ -56,6 +58,7 @@ export function DataTable<TData extends DataTableProps>({
   isLoading,
   isRefetching,
 }: DataTableProps<TData>) {
+  const { title } = useContext(TableContext);
   const {
     pagination,
     sorting,
@@ -67,7 +70,7 @@ export function DataTable<TData extends DataTableProps>({
   } = useDataTableUrlState();
 
   const [searchValue, setSearchValue] = useState(search);
-  const [columnVisibility, setColumnVisibility] = useState({});
+  const columnVisibilityAtom = useCreateAtom<ColumnVisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
   const resolvedColumns = useMemo(() => {
@@ -82,15 +85,19 @@ export function DataTable<TData extends DataTableProps>({
       data,
       manualPagination: true,
       manualSorting: true,
-      rowCount,
-      state: { pagination, sorting, columnVisibility, rowSelection },
+      rowCount: rowCount,
+      state: { pagination, sorting, rowSelection },
+      atoms: {
+        columnVisibility: columnVisibilityAtom,
+      },
       onPaginationChange,
       onSortingChange,
-      onColumnVisibilityChange: setColumnVisibility,
       onRowSelectionChange: setRowSelection,
     },
     (state) => state,
   );
+
+  console.log('TABLE : ', table?.getRowModel().rows);
 
   return (
     <div
@@ -154,9 +161,9 @@ export function DataTable<TData extends DataTableProps>({
           {/* BODY */}
           <TableBody>
             {table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row, index) => (
                 <TableRow key={row.id}>
-                  {row?.getAllCells().map((cell) => (
+                  {row?.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -179,35 +186,7 @@ export function DataTable<TData extends DataTableProps>({
           </TableBody>
         </Table>
       </div>
-      {/* <div className="w-full flex items-center justify-between space-x-2 my-4"> */}
-      {/* <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div> */}
-      {/* <div className="flex items-center justify-end space-x-2 ">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div> */}
-      <DataTablePagination
-        table={table}
-        rowCount={rowCount}
-        className="my-2 px-4"
-      />
-      {/* </div> */}
+      <DataTablePagination table={table} className="my-2 px-4" />
     </div>
   );
 }

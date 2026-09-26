@@ -74,7 +74,7 @@ function page() {
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row) => (
+            {table.getAllCells().rows.map((row) => (
               <tr key={row.id}>
                 {row.getAllCells().map((cell) => (
                   <td key={cell.id}>

@@ -12,6 +12,7 @@ export function ModuleListTableSection() {
       columns={columns}
       queryKey={['module-list']}
       queryFn={(params) => handleAPICall(params, getModuleListController)}
+      rowSelect={false}
     />
   );
 }
