@@ -1,21 +1,16 @@
 'use client';
-import * as React from 'react';
-import {
-  useTable,
-  type ColumnDef,
-  type RowData,
-  type SortingState,
-  type ColumnFiltersState,
-  type ColumnVisibilityState,
-  flexRender,
-} from '@tanstack/react-table';
+import { useState, useEffect, useMemo } from 'react';
 
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  ColumnDef,
+  columnVisibilityFeature,
+  flexRender,
+  rowPaginationFeature,
+  rowSelectionFeature,
+  rowSortingFeature,
+  tableFeatures,
+  useTable,
+} from '@tanstack/react-table';
 
 import { Input } from '@/components/ui/input';
 
@@ -29,78 +24,88 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 
-import { features, type DataTableFeatures } from './data-table-features';
 import { DataTablePagination } from './DataTablePagination';
 import { DataTableViewOptions } from './DataTableViewOptions';
+import { useDataTableUrlState } from './use-data-table-url-state';
 import { usePathname, useRouter } from 'next/navigation';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 
-interface DataTableProps<TData extends RowData> {
+const features = tableFeatures({
+  rowSortingFeature,
+  rowPaginationFeature,
+  columnVisibilityFeature,
+  rowSelectionFeature,
+});
+
+interface DataTableProps<TData> {
   title?: string;
-  columns: ColumnDef<DataTableFeatures, TData>[];
-  data: TData[];
+  columns: ColumnDef<any, TData>[];
+  data: TData[]; // just the current page's rows
+  rowCount: number; // TOTAL rows across all pages, from the server
   rowSelect?: boolean;
+  isLoading?: boolean;
+  isRefetching?: boolean;
 }
 
-export function DataTable<TData extends RowData>({
+export function DataTable<TData extends DataTableProps>({
   title,
   columns,
   data,
+  rowCount,
   rowSelect = false,
+  isLoading,
+  isRefetching,
 }: DataTableProps<TData>) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<ColumnVisibilityState>({});
+  const {
+    pagination,
+    sorting,
+    search,
+    onPaginationChange,
+    onSortingChange,
+    onSearchChange,
+    isPending,
+  } = useDataTableUrlState();
 
-  const resolvedColumns = React.useMemo(() => {
+  const [searchValue, setSearchValue] = useState(search);
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [rowSelection, setRowSelection] = useState({});
+
+  const resolvedColumns = useMemo(() => {
     if (rowSelect) return columns;
     return columns.filter((col) => col.id !== 'select');
   }, [columns, rowSelect]);
 
-  const [rowSelection, setRowSelection] = React.useState({});
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      router.replace(`${pathname}?${searchQuery?.toString()}`);
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  const table = useTable({
-    features,
-    enableRowSelection: rowSelect,
-    data,
-    columns: resolvedColumns,
-    onColumnFiltersChange: setColumnFilters,
-    onSortingChange: setSorting,
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
+  const table = useTable(
+    {
+      features,
+      columns: resolvedColumns,
+      data,
+      manualPagination: true,
+      manualSorting: true,
+      rowCount,
+      state: { pagination, sorting, columnVisibility, rowSelection },
+      onPaginationChange,
+      onSortingChange,
+      onColumnVisibilityChange: setColumnVisibility,
+      onRowSelectionChange: setRowSelection,
     },
-  });
+    (state) => state,
+  );
 
   return (
-    <div className="min-h-0 flex-1 flex flex-col border">
+    <div
+      className="min-h-0 min-w-0 flex-1 flex flex-col border w-full"
+      aria-busy={isLoading || isRefetching}
+    >
       <div className="flex items-center p-4">
         {title && <h2 className="text-lg font-medium">{title}</h2>}
         <div className="w-auto flex items-center space-x-2 ml-auto">
           <Input
             placeholder="Filter emails..."
-            value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
+            value={searchValue ?? ''}
             onChange={(event) => {
-              setSearchQuery(event.target.value);
-              table.getColumn('email')?.setFilterValue(event.target.value);
+              setSearchValue(event.target.value);
+              onSearchChange(event.target.value);
             }}
             autoComplete="off"
             className="max-w-md"
@@ -109,32 +114,49 @@ export function DataTable<TData extends RowData>({
           <DataTableViewOptions table={table} />
         </div>
       </div>
-      <div className="min-h-0 flex-1 overflow-auto rounded-md border-y">
+      <div className="min-w-0 min-h-0 flex-1 overflow-auto rounded-md border-y">
         <Table>
-          {/* HEADER */}
-          <TableHeader className="sticky top-0 z-10 bg-background">
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  const sorted = header.column.getIsSorted();
+                  const Icon =
+                    sorted === 'asc'
+                      ? ArrowUp
+                      : sorted === 'desc'
+                        ? ArrowDown
+                        : ArrowUpDown;
+
+                  return (
+                    <TableHead key={header.id} colSpan={header.colSpan}>
+                      {header.isPlaceholder ? null : header.column.getCanSort() ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="-ml-3 h-8 data-[state=open]:bg-accent"
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          <table.FlexRender header={header} />
+                          <Icon className="ml-2" />
+                        </Button>
+                      ) : (
+                        <span className="text-sm font-medium">
+                          <table.FlexRender header={header} />
+                        </span>
+                      )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
             ))}
           </TableHeader>
-
           {/* BODY */}
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
+                  {row?.getAllCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -157,7 +179,6 @@ export function DataTable<TData extends RowData>({
           </TableBody>
         </Table>
       </div>
-
       {/* <div className="w-full flex items-center justify-between space-x-2 my-4"> */}
       {/* <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{' '}
@@ -181,7 +202,11 @@ export function DataTable<TData extends RowData>({
             Next
           </Button>
         </div> */}
-      <DataTablePagination table={table} className="my-2 px-4" />
+      <DataTablePagination
+        table={table}
+        rowCount={rowCount}
+        className="my-2 px-4"
+      />
       {/* </div> */}
     </div>
   );

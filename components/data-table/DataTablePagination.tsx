@@ -20,6 +20,7 @@ import { cn } from 'cn';
 
 interface DataTablePaginationProps<TData extends RowData> {
   table: ReactTable<TasksTableFeatures, TData>;
+  rowCount: number;
   className?: string;
 }
 

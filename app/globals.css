@@ -23,6 +23,21 @@ p {
   font-weight: 300 !important;
 }
 
+::-webkit-scrollbar {
+  width: 2px;
+  height: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: var(--secondary);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

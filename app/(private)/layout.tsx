@@ -37,8 +37,10 @@ export default function PrivateRouteLayout({
     <SidebarProvider>
       <PrivateRouteAuthGuard>
         <AppSidebar />
-        <SidebarInset>
-          <div className="w-full h-full px-4 pb-2">{children}</div>
+        <SidebarInset className="min-w-0">
+          <div className="min-w-0 min-h-0 w-full h-full px-4 pb-2">
+            {children}
+          </div>
           <Toaster />
         </SidebarInset>
       </PrivateRouteAuthGuard>

@@ -18,87 +18,64 @@ import {
 import { type DataTableFeatures } from './data-table-features';
 import { DataTableColumnHeader } from './data-table-column-header';
 
+import { Badge } from '@/components/ui/badge';
+
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type Payment = {
-  id: string;
-  amount: number;
-  status: 'pending' | 'processing' | 'success' | 'failed';
-  email: string;
-};
+export interface Module {
+  module_id: string;
+  name: string;
+  portal_id: string;
+  description: string;
+  is_system: boolean;
+  is_active: boolean;
+  total_records: string; // comes back as a string from the API, cast when sorting/displaying as a number
+}
 
-// Use `accessor` for data columns and `display` for columns without one.
-const columnHelper = createColumnHelper<DataTableFeatures, Payment>();
+const columnHelper = createColumnHelper<Module>();
 
-export const columns = columnHelper.columns([
-  columnHelper.display({
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        indeterminate={
-          table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
+export const columns = [
+  columnHelper.accessor('name', {
+    header: 'Name',
+    cell: (info) => <span className="font-medium">{info.getValue()}</span>,
+    enableSorting: true,
+  }),
+  columnHelper.accessor('description', {
+    header: 'Description',
+    cell: (info) => (
+      <span className="text-muted-foreground">{info.getValue()}</span>
     ),
     enableSorting: false,
-    enableHiding: false,
   }),
-  columnHelper.accessor('status', {
+  columnHelper.accessor('total_records', {
+    header: 'Records',
+    cell: (info) => Number(info.getValue()).toLocaleString(),
+    enableSorting: true,
+  }),
+  columnHelper.accessor('is_system', {
+    header: 'System',
+    cell: (info) => (
+      <Badge variant={info.getValue() ? 'secondary' : 'outline'}>
+        {info.getValue() ? 'System' : 'Custom'}
+      </Badge>
+    ),
+    enableSorting: false,
+  }),
+  columnHelper.accessor('is_active', {
     header: 'Status',
-  }),
-  columnHelper.accessor('email', {
-    header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Email" />;
-    },
-  }),
-  columnHelper.accessor('amount', {
-    header: () => <div className="text-right">Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('amount'));
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(amount);
-
-      return <div className="text-right font-medium">{formatted}</div>;
-    },
+    cell: (info) => (
+      <Badge variant={info.getValue() ? 'default' : 'destructive'}>
+        {info.getValue() ? 'Active' : 'Inactive'}
+      </Badge>
+    ),
+    enableSorting: true,
   }),
   columnHelper.display({
     id: 'actions',
-    cell: ({ row }) => {
-      const payment = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={<Button variant="ghost" className="h-8 w-8 p-0" />}
-          >
-            <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    header: '',
+    cell: (info) => (
+      // wire up your row menu / edit-link here, using info.row.original.module_id
+      <span className="text-sm text-muted-foreground">•••</span>
+    ),
   }),
-]);
+];
