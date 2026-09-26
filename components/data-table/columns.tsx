@@ -34,10 +34,6 @@ export interface Module {
 const columnHelper = createColumnHelper<typeof features, Module>();
 
 export const columns = [
-  columnHelper.display({
-    id: 'Sr',
-    cell: (props) => '1',
-  }),
   columnHelper.accessor('name', {
     header: 'Name',
     cell: (info) => <span className="font-medium">{info.getValue()}</span>,
